@@ -1,5 +1,9 @@
 package com.rvl.android.getnzb;
 
+/* (C) 2010 Robin van Leeuwen
+ * Licence: GPLv2 or later.
+ */
+
 import android.app.Activity;
 import android.os.Bundle;
 
