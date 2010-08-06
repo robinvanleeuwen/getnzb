@@ -18,6 +18,7 @@ import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -40,9 +41,11 @@ import android.widget.TextView;
 public class getnzb extends Activity {
 	public static final int MENU_PREFS = 0;
 	public static final int MENU_QUIT = 1;
-	HttpClient httpclient = new DefaultHttpClient();
+	public boolean LOGGEDIN = false;
+	DefaultHttpClient httpclient = new DefaultHttpClient();
 	CookieStore cookies = new BasicCookieStore();
 	ProgressDialog pd = null;
+	
 	
 	public static SharedPreferences preferences;
 	
@@ -87,11 +90,10 @@ public class getnzb extends Activity {
     	
     	new Thread() {
 			public void run(){
-	
+				
 				Log.d(tags.LOG,"Login function started.");
 				SharedPreferences pref = getSharedPreferences(tags.PREFS, 0);
-				Log.d(tags.LOG,"Using login name:"+pref.getString("nzbsusername", "No value given."));
-							
+				Log.d(tags.LOG,"Using login name: '"+pref.getString("nzbsusername", "No value given.")+"'");
 				HttpPost httppost = new HttpPost(tags.NZBS_LOGINPAGE);
 				
 				List<NameValuePair> nvp = new ArrayList<NameValuePair>(2);
@@ -103,11 +105,22 @@ public class getnzb extends Activity {
 					httppost.setEntity(new UrlEncodedFormEntity(nvp));
 					HttpResponse httpresponse = httpclient.execute(httppost);
 					HttpEntity entity = httpresponse.getEntity();
+					
 					if(entity != null){
-						entity.consumeContent();
-						
+						entity.consumeContent();					
 					}
-	    
+					List<Cookie> cookielist = httpclient.getCookieStore().getCookies();
+					// If we are logged in we got three cookies. A a php-sessionid, username and a id-hash.
+					if (cookielist.isEmpty()) {
+			            Log.d(tags.LOG,"No cookies, not logged in.");
+			        } else {
+			        	Log.d(tags.LOG,"Received "+cookielist.size()+" cookies: ");
+			            for (int i = 0; i < cookielist.size(); i++) {
+			                Log.d(tags.LOG,"- " + cookielist.get(i).toString());
+			            }
+			            LOGGEDIN = true;
+			        }
+					
 				} catch (UnsupportedEncodingException e) {
 				
 				} catch (ClientProtocolException e) {
@@ -122,10 +135,19 @@ public class getnzb extends Activity {
     }
 	final Handler pd_handler = new Handler(){
 		public void handleMessage(Message msg){
+			TextView statusbar = (TextView) findViewById(R.id.statusbar);
+			if(LOGGEDIN) statusbar.setText("You are logged in.");
 			pd.dismiss();
+			if(LOGGEDIN){
+				startsearch();
+			}
 		}
 	};
     
+	public void startsearch(){
+		startActivity(new Intent(this,search.class));
+	}
+	
     public void startpreferences(){
         startActivity(new Intent(this,preferences.class));
     }
