@@ -13,6 +13,7 @@
 			android:title="nzbs password" 
 			android:summary="@string/preferences_nzbs_password"
 			android:defaultValue="@string/preferences_nzbs_password_default"
+			android:password="true"
 			/>
   </PreferenceCategory>
   <PreferenceCategory android:title="www.nzbs.org preferences" >
@@ -33,6 +34,7 @@
 			android:title="HellaNZB Password" 
 			android:summary="@string/preferences_hellanzb_password"
 			android:defaultValue="@string/preferences_hellanzb_password_default"
+			android:password="true"
 			/>
   	
   </PreferenceCategory>  
