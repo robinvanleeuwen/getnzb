@@ -2,4 +2,14 @@
 <resources>
     <string name="hello">Hello World, main!</string>
     <string name="app_name">getnzb</string>
+    <string name="preferences_nzbs_username">Username of nzbs.org account</string>
+	<string name="preferences_nzbs_username_default"></string>
+	<string name="preferences_nzbs_password">Password of nzbs.org account</string>
+	<string name="preferences_nzbs_password_default"></string>
+	<string name="preferences_hellanzb_hostname">Hostname of HellaNZB server</string>
+	<string name="preferences_hellanzb_hostname_default"></string>
+	<string name="preferences_hellanzb_port">HellaNZB server port</string>
+	<string name="preferences_hellanzb_port_default">8760</string>
+	<string name="preferences_hellanzb_password">Password of HellaNZB server</string>
+	<string name="preferences_hellanzb_password_default"></string>
 </resources>

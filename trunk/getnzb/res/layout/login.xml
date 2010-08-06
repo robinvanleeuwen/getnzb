@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:background="@drawable/background">
+<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/welcome" android:textStyle="bold" android:typeface="sans" android:textColor="#D6CBF2" android:textSize="25dip" android:layout_x="50dip" android:layout_y="70dip" android:text="Welcome to GetNZB"></TextView>
+<Button android:text="Login" android:layout_width="130dip" android:layout_height="50dip" android:layout_y="160dip" android:layout_x="99dip" android:textStyle="bold" android:typeface="sans" android:id="@+id/button_login" android:onClick="button_handler"></Button>
+</AbsoluteLayout>
