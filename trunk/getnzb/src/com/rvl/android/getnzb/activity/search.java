@@ -29,7 +29,6 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 
-
 import com.rvl.android.getnzb.R;
 import com.rvl.android.getnzb.getnzb;
 import com.rvl.android.getnzb.tags;
@@ -59,6 +58,30 @@ public class search extends Activity {
 		 			SEARCHTERM = ed.getText().toString().trim().replaceAll(" ", "+");
 		 			new searchnzb().execute(SEARCHTERM); 		
 	    		break;
+	    	case R.id.btn_next:
+	    		if(HITLIST.length == 25){
+	    			HITLIST = null;
+	    			CURRENT_PAGE++;
+	    			new searchnzb().execute(SEARCHTERM);
+	    		}
+	    		else{
+	    			TextView statusbar = (TextView) findViewById(R.id.statusbar);
+	    			statusbar.setText("No more matches.");
+	    		}
+	    		break;
+	    	case R.id.btn_previous:
+	    		HITLIST = null;
+	    		if(CURRENT_PAGE > 1) CURRENT_PAGE--;
+	    		new searchnzb().execute(SEARCHTERM);
+	    		break;
+	    	case R.id.btn_backtosearch:
+	    		HITLIST = null;
+	    		CURRENT_PAGE = 1;
+	    		setContentView(R.layout.search);
+	    		TextView statusbar = (TextView) findViewById(R.id.statusbar);
+	    		statusbar.setText("Enter searchterm.");
+	    		break;
+
 	    	}
 	}
 	
