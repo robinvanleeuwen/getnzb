@@ -41,9 +41,9 @@ import android.widget.TextView;
 public class getnzb extends Activity {
 	public static final int MENU_PREFS = 0;
 	public static final int MENU_QUIT = 1;
-	public boolean LOGGEDIN = false;
-	DefaultHttpClient httpclient = new DefaultHttpClient();
-	CookieStore cookies = new BasicCookieStore();
+	public static boolean LOGGEDIN = false;
+	public static DefaultHttpClient httpclient = new DefaultHttpClient();
+	//public static CookieStore cookies = new BasicCookieStore();
 	ProgressDialog pd = null;
 	
 	
@@ -91,7 +91,7 @@ public class getnzb extends Activity {
     	new Thread() {
 			public void run(){
 				
-				Log.d(tags.LOG,"Login function started.");
+				Log.d(tags.LOG,"* Login function started.");
 				SharedPreferences pref = getSharedPreferences(tags.PREFS, 0);
 				Log.d(tags.LOG,"Using login name: '"+pref.getString("nzbsusername", "No value given.")+"'");
 				HttpPost httppost = new HttpPost(tags.NZBS_LOGINPAGE);
