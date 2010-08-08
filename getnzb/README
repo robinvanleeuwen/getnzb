@@ -1,0 +1,36 @@
+
+GetNZB - http://getnzb.googlecode.com
+"Search www.nzbs.org and upload .nzb file to HellaNZB server"
+
+--------------
+This file is a part of GetNZB
+
+GetNZB is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+GetNZB is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GetNZB.  If not, see <http://www.gnu.org/licenses/>.
+
+--------------
+Thanks for Code/libraries which are used in this project:
+  
+  android-xmlrpc
+  pskink et al. (Apache License, Version 2.0)
+  http://code.google.com/p/android-xmlrpc/
+
+  HellaDroid
+  GPLv3 or later
+  Torstein S. Skulbru <serrghi> 
+  http://code.google.com/p/helladroid
+
+  HTMLCleaner
+  vnikic@users.sourceforge.net
+  BSD Licence
+  http://htmlcleaner.sourceforge.net/

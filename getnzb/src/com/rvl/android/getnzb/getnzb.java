@@ -1,6 +1,6 @@
 package com.rvl.android.getnzb;
 
-/* (C) 2010 Robin van Leeuwen
+/* (C) 2010 Robin van Leeuwen (robinvanleeuwen@gmail.com)
  * Licence: GPLv2 or later.
  */
 

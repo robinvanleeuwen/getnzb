@@ -1,3 +1,7 @@
+/* (C) 2010 Robin van Leeuwen (robinvanleeuwen@gmail.com)
+ * Licence: GPLv2 or later.
+ */
+
 package com.rvl.android.getnzb.activity;
 
 import java.io.IOException;
@@ -23,6 +27,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -39,6 +44,7 @@ public class search extends Activity {
 	private DefaultHttpClient httpclient = getnzb.httpclient;
 	private boolean LOGGEDIN = getnzb.LOGGEDIN;
 	public static String HITLIST[][];
+	public boolean ENABLE_NEXTBUTTON = true;
 	public String SEARCHTERM = "";
 	public int CURRENT_PAGE = 1; 	// Start searching on page 1
 	
@@ -138,6 +144,21 @@ public class search extends Activity {
 				TagNode row = (TagNode) nzbtable[0];
 				
 				int numhits = row.getChildren().size() - 3;
+				
+				// Check if there is a next-page...
+				// if so, the button is enabled in build_item_list()
+				// since we can't do it in this thread...
+				Log.d(tags.LOG,"Checking if next button needs to be disabled.");
+				
+				if(numhits < 25){
+					Log.d(tags.LOG,"Disabling next-button");
+					ENABLE_NEXTBUTTON = false;
+				}
+				else{
+					Log.d(tags.LOG,"Enabling next-button");
+					ENABLE_NEXTBUTTON = true;							
+				}
+				
 				Log.d(tags.LOG,"Found "+Integer.toString(numhits)+" items. Adding them to list.");
 				this.n = numhits;
 				int counterincrement = 88 / numhits;
@@ -174,7 +195,6 @@ public class search extends Activity {
 					hit[c][3] = atag.getAttributeByName("href").replaceAll("&amp;", "&"); 
 					progresscounter += counterincrement;
 					this.search_dialog.setProgress(progresscounter);
-					//this.search_dialog.setMessage("Item "+Integer.toString(c+1)+" added...");
 					Log.d(tags.LOG,"Item "+Integer.toString(c+1)+" added...");
 				}
 				
@@ -238,6 +258,11 @@ public class search extends Activity {
     		item = "";
     	}
     	aa.notifyDataSetChanged();
+    
+    	// Enable or disable the button for next results page...
+    	Button nextbutton = (Button) findViewById(R.id.btn_next);
+    	nextbutton.setEnabled(ENABLE_NEXTBUTTON);
+    	
     }
         		
 	protected void onDestroy() {
