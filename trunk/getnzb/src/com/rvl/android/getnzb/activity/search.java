@@ -4,23 +4,36 @@
 
 package com.rvl.android.getnzb.activity;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 import org.htmlcleaner.XPatherException;
+import org.xmlrpc.android.XMLRPCClient;
+import org.xmlrpc.android.XMLRPCException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,7 +45,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
-
 
 import com.rvl.android.getnzb.R;
 import com.rvl.android.getnzb.getnzb;
@@ -147,7 +159,7 @@ public class search extends Activity {
 				
 				// Check if there is a next-page...
 				// if so, the button is enabled in build_item_list()
-				// since we can't do it in this thread...
+				// since we can't do it in this thread (non-UI-operations only)...
 				Log.d(tags.LOG,"Checking if next button needs to be disabled.");
 				
 				if(numhits < 25){
@@ -244,7 +256,7 @@ public class search extends Activity {
 					long id) {
 					String pos = Integer.toString(position);
 					Log.d(tags.LOG,"Sending download command for position "+pos);
-					//new senddownloadcommand().execute(pos); 					
+					new senddownloadcommand().execute(pos); 					
 			}
     	});
     	   	
@@ -269,5 +281,82 @@ public class search extends Activity {
 		Log.d(tags.LOG,"Leaving search activity.");
 		super.onDestroy();
 	}
+    
+    private class senddownloadcommand extends AsyncTask<String, Void, Void>{
+    	ProgressDialog sdc_dialog = new ProgressDialog(search.this);
+    
+    	protected void onPreExecute(){
+    		this.sdc_dialog.setMessage("Downloading .nzb file...");
+    		this.sdc_dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+    		this.sdc_dialog.show();
+    	}
+    	
+    	protected Void doInBackground(final String... args){
+    		
+	    	SharedPreferences settings = getSharedPreferences(tags.PREFS, 0);
+  	
+	    	int position = Integer.parseInt(args[0]);
+    	    		
+    		try{
+    			 // Send data to server:
+    			 Log.d(tags.LOG, "--------Starting Getter----------");
+    			 
+    			  URI uri = new URI("http://www.nzbs.org/"+HITLIST[position][3]);
+    			  
+    			  HttpGet getter = new HttpGet(uri);
+    			  getter.setHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT5.1; en-US; rv:1.8.1.20) Gecko/20081217 Firefox/2.0.0.20");
+    			  
+    			  HttpResponse r = httpclient.execute(getter);
+    			  Header[] headers = r.getAllHeaders();
+    			  
+    			  for(Header header: headers) Log.d(tags.LOG, header.getName()+": "+header.getValue());
+    			
+    			  HttpEntity entity = r.getEntity();
+    			  String filename = HITLIST[position][0]+".nzb";
+    			  if(entity != null){
+    		
+    				  InputStream is = entity.getContent();
+    				  
+    				  Log.d(tags.LOG, "Saving file:"+filename); 
+    				 
+    				  FileOutputStream out = openFileOutput(filename,Activity.MODE_WORLD_WRITEABLE);
+    		
+    				  Log.d(tags.LOG, "Created output file...");
+    				  byte buf[] = new byte[1024];
+    				  int len;
+    				  int i=0;
+    				  while((len=is.read(buf))>0){
+    					  i++;
+    					  out.write(buf, 0, len);
+    				  }
+    				  Log.d(tags.LOG, "Done writing (wrote "+i*1024+" bytes)...");
+    				  out.close();
+    				  is.close();
+    				  String list[] = fileList();
+    				  for(int c=0;c<list.length;c++){
+    					 Log.d(tags.LOG,"List of local files: "+list[c]); 
+    					 
+    				  }
+    				  Log.d(tags.LOG,"Preparing to upload file:"+filename);
+    				  
+    			  }
+    
+    		} catch (UnsupportedEncodingException e) {
+    			Log.d(tags.LOG,"Unsupported Encoding Exception: "+e.getMessage());
+    		} catch (ClientProtocolException e) {
+    			Log.d(tags.LOG, "Client Protocol Exception: "+e.getMessage());
+    		} catch (IOException e) {	
+    			Log.d(tags.LOG, "IO Exception: "+e.getMessage());
+    		} catch (URISyntaxException e) {
+    			Log.d(tags.LOG, "URI Syntax exception: "+e.getMessage());
+			}
+    		return null;
+    	}
+		protected void onPostExecute(final Void unused){
+    		this.sdc_dialog.dismiss();
+    		return;
+		}
+    	
+    }
 	
 }

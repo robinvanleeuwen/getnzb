@@ -5,6 +5,7 @@
   android:layout_height="wrap_content"
   android:background="@drawable/background">
 <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/welcome" android:textStyle="bold" android:typeface="sans" android:textColor="#D6CBF2" android:textSize="25dip" android:layout_x="50dip" android:layout_y="70dip" android:text="Welcome to GetNZB"></TextView>
-<Button android:text="Login" android:layout_width="130dip" android:layout_height="50dip" android:layout_y="160dip" android:layout_x="99dip" android:textStyle="bold" android:typeface="sans" android:id="@+id/button_login" android:onClick="button_handler"></Button>
+<Button android:layout_height="50dip" android:layout_y="160dip" android:textStyle="bold" android:typeface="sans" android:id="@+id/button_login" android:onClick="button_handler" android:layout_width="170dip" android:layout_x="79dip" android:text="Search nzbs.org"></Button>
 <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_x="2dip" android:layout_y="410dip" android:id="@+id/statusbar" android:text="You are not logged in. Please log in."></TextView>
+<Button android:layout_y="230dip" android:layout_height="50dip" android:textStyle="bold" android:typeface="sans" android:id="@+id/button_hellanzb" android:onClick="button_handler" android:layout_width="170dip" android:layout_x="79dip" android:text="Manage .nzb files"></Button>
 </AbsoluteLayout>
