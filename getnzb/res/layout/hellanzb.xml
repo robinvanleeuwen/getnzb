@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:background="@drawable/background">
+  
+<Button android:layout_x="1dip" android:layout_y="1dip" android:layout_height="50dip" android:id="@+id/button_connecthella" android:text="Connect" android:textStyle="bold" android:onClick="button_handler_hellanzb" android:layout_width="160dip"></Button><Button android:layout_y="1dip" android:layout_height="50dip" android:textStyle="bold" android:typeface="sans" android:onClick="button_handler_hellanzb" android:text="List Files" android:id="@+id/button_listfiles" android:layout_x="161dip" android:layout_width="160dip"></Button>
+<TextView android:layout_width="wrap_content" android:layout_y="65dip" android:layout_height="wrap_content" android:text="HellaNZB Status" android:id="@+id/hellastatus" android:textStyle="bold" android:layout_x="8dip"></TextView>
+<ListView android:layout_y="100dip" android:layout_height="320dip" android:layout_width="310dip" android:layout_x="5dip" android:id="@+id/filelist01"></ListView>
+</AbsoluteLayout>

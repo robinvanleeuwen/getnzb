@@ -14,12 +14,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -55,6 +52,7 @@ public class getnzb extends Activity {
     	Log.d(tags.LOG,"------ STARTING GETNZB ------");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
+        preferences = getSharedPreferences(tags.PREFS,0);
     }
     
     public boolean onCreateOptionsMenu(Menu menu){
@@ -79,6 +77,9 @@ public class getnzb extends Activity {
     	case R.id.button_login:
     		pd = ProgressDialog.show(getnzb.this, "http://www.nzbs.org", "Logging in, please wait...");
  			login();
+    		break;
+    	case R.id.button_hellanzb:
+    		starthellanzb();
     		break;
     	}
     }
@@ -146,6 +147,10 @@ public class getnzb extends Activity {
     
 	public void startsearch(){
 		startActivity(new Intent(this,search.class));
+	}
+	
+	public void starthellanzb(){
+		startActivity(new Intent(this,hellanzb.class));
 	}
 	
     public void startpreferences(){
