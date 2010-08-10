@@ -17,8 +17,12 @@ import org.xmlrpc.android.XMLRPCException;
 import com.rvl.android.getnzb.getnzb;
 import com.rvl.android.getnzb.tags;
 import com.rvl.android.getnzb.R;
+
+
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -109,9 +113,8 @@ public class hellanzb extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View v, int position,
 					long id) {
-					String list[] = fileList();
-						
-					uploadfile(list[position]);
+					String list[] = fileList();					
+					new uploadfile(list[position]).execute(list[position]);
 			}	
     	});
     	   	
@@ -124,6 +127,7 @@ public class hellanzb extends Activity {
 	
     	aa.notifyDataSetChanged();
     }
+    
 	public Object hellanzbcall(String command) {
 		try {
 			if(CONNECTED) {
@@ -174,24 +178,51 @@ public class hellanzb extends Activity {
 		return null;
 	}
 
-	
-	public void uploadfile(String filename){
-		Log.d(tags.LOG,"uploadfile():"+getFilesDir()+"/"+filename);
-		File nzbfile = new File(getFilesDir()+"/"+filename);
-		String filedata;
-		try {
-			filedata = readfile(nzbfile);
-			HashMap<String, Object> response = (HashMap<String, Object>) hellanzbcall("enqueue", nzbfile.getName(), filedata);
-
-		} catch (IOException e) {
-			Log.d(tags.LOG,"uploadfile(): IOException: "+e.getMessage());
+	private class uploadfile extends AsyncTask<String, Void, Void>{
+		ProgressDialog uploaddialog = new ProgressDialog(hellanzb.this);
+		String filename;
+		
+		@SuppressWarnings("unused")
+		uploadfile(final String name){
+			this.filename = name;
 		}
+		
+	   	protected void onPreExecute(){
+    		this.uploaddialog.setMessage("Uploading '"+this.filename+"' to HellaNZB server...");
+    		this.uploaddialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+    		this.uploaddialog.show();
+    	}
+		
+		@Override
+		protected Void doInBackground(String... params) {
+			String filename = params[0];
+			Log.d(tags.LOG,"uploadfile():"+getFilesDir()+"/"+filename);
+			File nzbfile = new File(getFilesDir()+"/"+filename);
+			String filedata;
+			try {
+				filedata = readfile(nzbfile);
+				HashMap<String, Object> response = (HashMap<String, Object>) hellanzbcall("enqueue", nzbfile.getName(), filedata);
+
+			} catch (IOException e) {
+				Log.d(tags.LOG,"uploadfile(): IOException: "+e.getMessage());
+			}
+			// Delete file after uploading...
+			deleteFile(filename);
+			return null;
+		}
+		protected void onPostExecute(final Void unused){
+    		this.uploaddialog.dismiss();
+    		// Reload file list...
+    		listfiles();
+    		return;
+		}
+
 	}
 	
+
+	
 	public static String readfile(File file) throws IOException {
-		Log.d(tags.LOG,"readfile(): Filepath:"+file.getAbsolutePath());
-		//Log.d(tags.LOG,"readfile(): Filepath:"+file.);
-		
+		Log.d(tags.LOG,"readfile(): Converting file to string. ("+file.getAbsolutePath()+")");
         FileInputStream stream = new FileInputStream(file);
         try {
                 FileChannel fc = stream.getChannel();
