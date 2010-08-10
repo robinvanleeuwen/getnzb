@@ -1,7 +1,13 @@
 package com.rvl.android.getnzb.activity;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -84,7 +90,7 @@ public class hellanzb extends Activity {
 	public void hellastatus(){
 		TextView statusbar = (TextView) findViewById(R.id.hellastatus);
 		Log.d(tags.LOG,"Calling status");
-		hellareturn = (HashMap<String, Object>) hellanzbcall("status","");
+		hellareturn = (HashMap<String, Object>) hellanzbcall("status");
 		statusbar.setText(hellareturn.get("is_paused").toString());
 	}
 	
@@ -103,39 +109,100 @@ public class hellanzb extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View v, int position,
 					long id) {
-					String pos = Integer.toString(position);
-					Log.d(tags.LOG,"Upload file number "+pos);	
-					
-					// PUT UPLOAD FILE TO HELLANZB CODE HERE!
-			
+					String list[] = fileList();
+						
+					uploadfile(list[position]);
 			}	
     	});
     	   	
     	itemlist.setAdapter(aa);
-    	
-		String list[] = fileList();
+    	String list[] = fileList();
 		for(int c=0;c<list.length;c++){
 			items.add(list[c]);
 			Log.d(tags.LOG,"List of local files: "+list[c]); 
 		}
+	
     	aa.notifyDataSetChanged();
     }
-	
-	public Object hellanzbcall(String command, String extra) {
+	public Object hellanzbcall(String command) {
 		try {
 			if(CONNECTED) {
-				if(extra != "") return client.call(command, extra);
-				else return client.call(command);
+				return client.call(command);
 			} else{
 				Log.d(tags.LOG,"hellanzbcall(): Not connected, connecting first.");
 				connect();
-				if(extra != "") return client.call(command, extra);
-				else return client.call(command);
+				return client.call(command);
 			}
 		} catch(XMLRPCException e) {
 			Log.e(tags.LOG, "hellanzbcall(): "+e.getMessage());
 			CONNECTED = false;
 		}
 		return null;
+	}
+
+	public Object hellanzbcall(String command, String extra1) {
+		try {
+			if(CONNECTED) {
+				return client.call(command, extra1);
+				
+			} else{
+				Log.d(tags.LOG,"hellanzbcall(): Not connected, connecting first.");
+				connect();
+				return client.call(command, extra1);
+			}
+		} catch(XMLRPCException e) {
+			Log.e(tags.LOG, "hellanzbcall(): "+e.getMessage());
+			CONNECTED = false;
+		}
+		return null;
+	}
+	
+	public Object hellanzbcall(String command, String extra1, String extra2) {
+		try {
+			if(CONNECTED) {
+				return client.call(command, extra1, extra2);
+				
+			} else{
+				Log.d(tags.LOG,"hellanzbcall(): Not connected, connecting first.");
+				connect();
+				return client.call(command, extra1, extra2);
+			}
+		} catch(XMLRPCException e) {
+			Log.e(tags.LOG, "hellanzbcall(): "+e.getMessage());
+			CONNECTED = false;
+		}
+		return null;
+	}
+
+	
+	public void uploadfile(String filename){
+		Log.d(tags.LOG,"uploadfile():"+getFilesDir()+"/"+filename);
+		File nzbfile = new File(getFilesDir()+"/"+filename);
+		String filedata;
+		try {
+			filedata = readfile(nzbfile);
+			HashMap<String, Object> response = (HashMap<String, Object>) hellanzbcall("enqueue", nzbfile.getName(), filedata);
+
+		} catch (IOException e) {
+			Log.d(tags.LOG,"uploadfile(): IOException: "+e.getMessage());
+		}
+	}
+	
+	public static String readfile(File file) throws IOException {
+		Log.d(tags.LOG,"readfile(): Filepath:"+file.getAbsolutePath());
+		//Log.d(tags.LOG,"readfile(): Filepath:"+file.);
+		
+        FileInputStream stream = new FileInputStream(file);
+        try {
+                FileChannel fc = stream.getChannel();
+                MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc
+                                .size());
+                /* Instead of using default, pass in a decoder. */
+                return Charset.defaultCharset().decode(bb).toString();
+        } 
+        finally 
+        {
+                stream.close();
+        }
 	}
 }

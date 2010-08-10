@@ -256,7 +256,7 @@ public class search extends Activity {
 					long id) {
 					String pos = Integer.toString(position);
 					Log.d(tags.LOG,"Sending download command for position "+pos);
-					new senddownloadcommand().execute(pos); 					
+					new downloadfile().execute(pos); 					
 			}
     	});
     	   	
@@ -282,7 +282,7 @@ public class search extends Activity {
 		super.onDestroy();
 	}
     
-    private class senddownloadcommand extends AsyncTask<String, Void, Void>{
+    private class downloadfile extends AsyncTask<String, Void, Void>{
     	ProgressDialog sdc_dialog = new ProgressDialog(search.this);
     
     	protected void onPreExecute(){
@@ -298,9 +298,6 @@ public class search extends Activity {
 	    	int position = Integer.parseInt(args[0]);
     	    		
     		try{
-    			 // Send data to server:
-    			 Log.d(tags.LOG, "--------Starting Getter----------");
-    			 
     			  URI uri = new URI("http://www.nzbs.org/"+HITLIST[position][3]);
     			  
     			  HttpGet getter = new HttpGet(uri);
@@ -318,7 +315,7 @@ public class search extends Activity {
     				  InputStream is = entity.getContent();
     				  
     				  Log.d(tags.LOG, "Saving file:"+filename); 
-    				 
+    				  Log.d(tags.LOG, "In directory:"+getFilesDir());
     				  FileOutputStream out = openFileOutput(filename,Activity.MODE_WORLD_WRITEABLE);
     		
     				  Log.d(tags.LOG, "Created output file...");
@@ -337,8 +334,6 @@ public class search extends Activity {
     					 Log.d(tags.LOG,"List of local files: "+list[c]); 
     					 
     				  }
-    				  Log.d(tags.LOG,"Preparing to upload file:"+filename);
-    				  
     			  }
     
     		} catch (UnsupportedEncodingException e) {
