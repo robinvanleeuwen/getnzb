@@ -2,12 +2,14 @@
 <RelativeLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="wrap_content"
-  android:layout_height="wrap_content">
+  android:layout_height="wrap_content"
+  android:background="@drawable/background">
 
 <Button android:layout_height="wrap_content" android:layout_alignParentBottom="true" android:text="Go to search..." android:onClick="btn_handler" android:id="@+id/btn_backtosearch" android:typeface="normal" android:textStyle="bold" android:layout_width="105dip"></Button>
-<Button android:layout_height="wrap_content" android:layout_toRightOf="@id/btn_backtosearch" android:layout_alignParentBottom="true" android:textStyle="bold" android:id="@+id/btn_previous" android:layout_width="105dip" android:text="Previous   Page" android:onClick="btn_handler"></Button><Button android:layout_height="wrap_content" android:id="@+id/btn_next" android:layout_toRightOf="@id/btn_previous" android:layout_alignParentBottom="true" android:layout_width="105dip" android:textStyle="bold" android:text="Next        Page" android:onClick="btn_handler"></Button><ListView android:layout_width="wrap_content" android:layout_above="@+id/Button01" android:id="@+id/itemlist01" android:layout_height="370dip"></ListView>
+<Button android:layout_height="wrap_content" android:layout_toRightOf="@id/btn_backtosearch" android:layout_alignParentBottom="true" android:textStyle="bold" android:id="@+id/btn_previous" android:layout_width="105dip" android:text="Previous   Page" android:onClick="btn_handler"></Button><Button android:layout_height="wrap_content" android:id="@+id/btn_next" android:layout_toRightOf="@id/btn_previous" android:layout_alignParentBottom="true" android:layout_width="105dip" android:textStyle="bold" android:text="Next        Page" android:onClick="btn_handler"></Button><ListView android:layout_width="wrap_content" android:id="@+id/itemlist01" android:layout_height="350dip" android:layout_below="@+id/text_nzbsresults"></ListView>
 
 
 
 
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/text_nzbsresults" android:textStyle="bold" android:text="nzbs.org search results, click to download:" android:textColor="#D6CBF2"></TextView>
 </RelativeLayout>

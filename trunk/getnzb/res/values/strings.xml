@@ -12,4 +12,5 @@
 	<string name="preferences_hellanzb_port_default">8760</string>
 	<string name="preferences_hellanzb_password">Password of HellaNZB server</string>
 	<string name="preferences_hellanzb_password_default"></string>
+	<string name="filelist_deletefile">Delete File</string>
 </resources>

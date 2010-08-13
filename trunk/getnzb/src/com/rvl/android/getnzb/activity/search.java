@@ -249,7 +249,7 @@ public class search extends Activity {
     	ArrayAdapter<String> aa = new ArrayAdapter<String>(this,com.rvl.android.getnzb.R.layout.itemslist,items);
    
     	ListView itemlist = (ListView) findViewById(R.id.itemlist01);
-    	
+    	itemlist.setCacheColorHint(00000000);
     	itemlist.setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View v, int position,
