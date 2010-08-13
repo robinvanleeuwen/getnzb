@@ -53,18 +53,11 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class hellanzb extends Activity {
@@ -87,7 +80,6 @@ public class hellanzb extends Activity {
 		Log.d(tags.LOG,"- Starting HellaNZB Activity!");
 		builder = new AlertDialog.Builder(this);
 		setContentView(R.layout.hellanzb);
-		TextView statusbar = (TextView) findViewById(R.id.hellastatus);
 		if(!CONNECTED) connect();
 		listfiles();
 	}
@@ -176,6 +168,8 @@ public class hellanzb extends Activity {
 		}
 		return CONNECT_FAILED_OTHER;
 	}
+	
+	@SuppressWarnings("unchecked")
 	public void hellastatus(){
 		TextView statusbar = (TextView) findViewById(R.id.hellastatus);
 		Log.d(tags.LOG,"Calling status");
@@ -272,7 +266,6 @@ public class hellanzb extends Activity {
  		
 		ProgressDialog uploaddialog = new ProgressDialog(hellanzb.this);
 		String filename;
-		@SuppressWarnings("unused")
 		uploadfile(final String name){
 			this.filename = name;
 		}
@@ -284,6 +277,7 @@ public class hellanzb extends Activity {
     		this.uploaddialog.show();
     	}
 		
+		@SuppressWarnings("unchecked")
 		@Override
 		protected Void doInBackground(String... params) {
 			Log.d(tags.LOG,"- hellanzb.uploadfile.doInBackground()");
@@ -293,6 +287,7 @@ public class hellanzb extends Activity {
 			String filedata;
 			try {
 				filedata = readfile(nzbfile);
+				@SuppressWarnings("unused")
 				HashMap<String, Object> response = (HashMap<String, Object>) hellanzbcall("enqueue", nzbfile.getName(), filedata);
 
 			} catch (IOException e) {

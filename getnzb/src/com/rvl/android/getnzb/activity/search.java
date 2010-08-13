@@ -33,27 +33,21 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 import org.htmlcleaner.XPatherException;
-import org.xmlrpc.android.XMLRPCClient;
-import org.xmlrpc.android.XMLRPCException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
-import android.content.SharedPreferences;
+
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -128,8 +122,11 @@ public class search extends Activity {
 	private class searchnzb extends AsyncTask<String, Void, Void>{
 		    
 	    ProgressDialog search_dialog = new ProgressDialog(search.this);
-	    private int n=-1;
-	    	
+	    
+	    @SuppressWarnings("unused")
+		private int n = -1;
+	    
+	    
 	    protected void onPreExecute(){
 	    	this.search_dialog.setMessage("Searching on nzbs.org and building list...");
 	    	this.search_dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -312,9 +309,7 @@ public class search extends Activity {
     	}
     	
     	protected Void doInBackground(final String... args){
-    		
-	    	SharedPreferences settings = getSharedPreferences(tags.PREFS, 0);
-  	
+    		  	
 	    	int position = Integer.parseInt(args[0]);
     	    		
     		try{
