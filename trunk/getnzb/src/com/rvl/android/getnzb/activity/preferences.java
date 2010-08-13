@@ -28,7 +28,6 @@ package com.rvl.android.getnzb.activity;
 import com.rvl.android.getnzb.tags;
 
 import com.rvl.android.getnzb.*;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.util.Log;

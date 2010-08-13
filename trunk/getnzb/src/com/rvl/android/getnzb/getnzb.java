@@ -41,7 +41,10 @@ import org.apache.http.message.BasicNameValuePair;
 
 import com.rvl.android.getnzb.activity.*;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -58,10 +61,15 @@ public class getnzb extends Activity {
 	public static final int MENU_PREFS = 0;
 	public static final int MENU_QUIT = 1;
 	public static boolean LOGGEDIN = false;
-	public static DefaultHttpClient httpclient = new DefaultHttpClient();
-	//public static CookieStore cookies = new BasicCookieStore();
-	ProgressDialog pd = null;
 	
+	public static final int DIALOG_NO_NZBS_SETTINGS=1;
+	public static final int DIALOG_NO_HELLANZB_SETTINGS=2;
+	
+	public static DefaultHttpClient httpclient = new DefaultHttpClient();
+	
+	ProgressDialog pd = null;
+	AlertDialog.Builder builder;
+	AlertDialog alert;
 	
 	public static SharedPreferences preferences;
 	
@@ -69,15 +77,46 @@ public class getnzb extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	Log.d(tags.LOG,"------ STARTING GETNZB ------");
-        super.onCreate(savedInstanceState);
+    	super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
         preferences = getSharedPreferences(tags.PREFS,0);
+        builder = new AlertDialog.Builder(this);
     }
     
     public boolean onCreateOptionsMenu(Menu menu){
 		menu.add(0, MENU_PREFS, 0, "Preferences");
 		menu.add(0, MENU_QUIT, 0, "Quit");
     	return true;
+    }
+    
+    protected Dialog onCreateDialog(int id){
+    	switch(id){
+    	case DIALOG_NO_NZBS_SETTINGS:
+    		builder.setTitle("No nzbs.org account settings.")
+			.setMessage("Do you wish to enter account settings now?")
+    		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					startpreferences();
+					return;
+				}
+			})
+			.setNegativeButton("No", null);
+			alert = builder.create();
+			return alert;
+		case DIALOG_NO_HELLANZB_SETTINGS:
+    		builder.setTitle("No HellaNZB server settings.")
+			.setMessage("Do you wish to enter HellaNZB settings now?")
+    		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					startpreferences();
+					return;
+				}
+			})
+			.setNegativeButton("No", null);
+			alert = builder.create();
+			return alert;
+    	}
+    	return null;
     }
     
     public boolean onOptionsItemSelected(MenuItem item){
@@ -94,11 +133,21 @@ public class getnzb extends Activity {
     public void button_handler(View v){
     	switch(v.getId()){
     	case R.id.button_login:
-    		pd = ProgressDialog.show(getnzb.this, "http://www.nzbs.org", "Logging in, please wait...");
- 			login();
+    		if(preferences.getString("nzbsusername", "") == ""){
+    			showDialog(DIALOG_NO_NZBS_SETTINGS);
+    		}
+    		else{
+    			pd = ProgressDialog.show(getnzb.this, "http://www.nzbs.org", "Logging in, please wait...");
+    			login();
+    		}
     		break;
     	case R.id.button_hellanzb:
-    		starthellanzb();
+    		if(preferences.getString("hellanzb_hostname", "")==""){
+    			showDialog(DIALOG_NO_HELLANZB_SETTINGS);
+    		}
+    		else {
+    			starthellanzb();
+    		}
     		break;
     	}
     }
@@ -156,7 +205,7 @@ public class getnzb extends Activity {
 	final Handler pd_handler = new Handler(){
 		public void handleMessage(Message msg){
 			TextView statusbar = (TextView) findViewById(R.id.statusbar);
-			if(LOGGEDIN) statusbar.setText("You are logged in.");
+			if(LOGGEDIN) statusbar.setText("Ready to search nzbs.org");
 			pd.dismiss();
 			if(LOGGEDIN){
 				startsearch();
