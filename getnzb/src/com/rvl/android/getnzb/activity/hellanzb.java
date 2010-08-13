@@ -34,21 +34,13 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import org.xmlrpc.android.XMLRPCClient;
 import org.xmlrpc.android.XMLRPCException;
-
 import com.rvl.android.getnzb.R;
 import com.rvl.android.getnzb.getnzb;
 import com.rvl.android.getnzb.tags;
-
-
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -71,72 +63,21 @@ public class hellanzb extends Activity {
 	public static final int CONNECT_OK = 1;
 	public static final int CONNECT_FAILED_NO_SETTINGS = 2;
 	public static final int CONNECT_FAILED_OTHER = 3;
-	AlertDialog.Builder builder;
-	AlertDialog alert;
-	
-	protected void onCreate(Bundle savedInstanceState) {
 
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.d(tags.LOG,"- Starting HellaNZB Activity!");
-		builder = new AlertDialog.Builder(this);
+		Log.d(tags.LOG,"- Starting HellaNZB Activity!");	
 		setContentView(R.layout.hellanzb);
+		
 		if(!CONNECTED) connect();
 		listfiles();
 	}
-	
-	
-	public Dialog onCreateDialog(int id) {
 		
-		switch(id) {
-	
-		case CONNECT_FAILED_NO_SETTINGS:
-			Log.d(tags.LOG,"Creating Alert Dialog 'no settings;");
-			builder.setTitle("No HellaNZB hostname.");
-			Log.d(tags.LOG, "set title");
-			builder.setMessage("GetNZB is not correctly configured. Do it now?");
-			Log.d(tags.LOG, "set message");
-			builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					showsettings();
-				}
-			});
-			Log.d(tags.LOG, "set pos button");
-			builder.setNegativeButton("No",
-					new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					return;
-				}
-			});
-			Log.d(tags.LOG, "set neg button.");
-			
-			Log.d(tags.LOG,"Created builder.");
-			alert = builder.create();
-			Log.d(tags.LOG,"Assigned builder.");
-			return alert;
-		}
-		return null;
-	}
-	
-	
-
-    public void button_handler_hellanzb(View v){
-    	switch(v.getId()){
-    
-    	}
-    }
-    
-	
 	public int connect(){
  		Log.d(tags.LOG,"- hellanzb.connect()");
 		Log.d(tags.LOG,"connect(): Getting preferences");
 		SharedPreferences prefs = getnzb.preferences;
 		String hellahost = prefs.getString("hellanzb_hostname", "");
-		if(hellahost == ""){
-			Log.d(tags.LOG,"connect(): Hostname is empty, settings not there?");
-			showDialog(CONNECT_FAILED_NO_SETTINGS);
-			
-			return CONNECT_FAILED_NO_SETTINGS;
-		}
 		TextView statusbar = (TextView) findViewById(R.id.hellastatus);
 		
 		if(!hellahost.matches("(https?)://.+")) 
@@ -168,21 +109,14 @@ public class hellanzb extends Activity {
 		}
 		return CONNECT_FAILED_OTHER;
 	}
-	
-	@SuppressWarnings("unchecked")
-	public void hellastatus(){
-		TextView statusbar = (TextView) findViewById(R.id.hellastatus);
-		Log.d(tags.LOG,"Calling status");
-		hellareturn = (HashMap<String, Object>) hellanzbcall("status");
-		statusbar.setText(hellareturn.get("is_paused").toString());
-	}
-	
+		
     public void listfiles(){
     	if(!CONNECTED) connect();
     	Log.d(tags.LOG, "- hellanzb.listfiles()");
     	setContentView(R.layout.hellanzb);
     	TextView statusbar = (TextView) findViewById(R.id.hellastatus);
     	statusbar.setText("Local files. Click to upload:");
+    	
     	// -- Bind the itemlist to the itemarray with the arrayadapter
     	ArrayList<String> items = new ArrayList<String>();
     	ArrayAdapter<String> aa = new ArrayAdapter<String>(this,com.rvl.android.getnzb.R.layout.itemslist,items);
@@ -205,16 +139,15 @@ public class hellanzb extends Activity {
 			items.add(list[c]);
 			Log.d(tags.LOG,"List of local files: "+list[c]); 
 		}
-	
+		
     	aa.notifyDataSetChanged();
     }
     
 	public Object hellanzbcall(String command) {
  		Log.d(tags.LOG,"- hellanzb.hellanzbcall(c)");
 		try {
-			if(CONNECTED) {
-				return client.call(command);
-			} else{
+			if(CONNECTED) return client.call(command);
+			else{
 				Log.d(tags.LOG,"hellanzbcall(): Not connected, connecting first.");
 				connect();
 				return client.call(command);
@@ -229,10 +162,8 @@ public class hellanzb extends Activity {
 	public Object hellanzbcall(String command, String extra1) {
  		Log.d(tags.LOG,"- hellanzb.hellanzbcall(c,e)"); 	
 		try {
-			if(CONNECTED) {
-				return client.call(command, extra1);
-				
-			} else{
+			if(CONNECTED) return client.call(command, extra1);
+			else{
 				Log.d(tags.LOG,"hellanzbcall(): Not connected, connecting first.");
 				connect();
 				return client.call(command, extra1);
@@ -308,24 +239,18 @@ public class hellanzb extends Activity {
 
 	}
 	
-
-	
 	public static String readfile(File file) throws IOException {
 		Log.d(tags.LOG,"readfile(): Converting file to string. ("+file.getAbsolutePath()+")");
         FileInputStream stream = new FileInputStream(file);
         try {
-                FileChannel fc = stream.getChannel();
-                MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc
-                                .size());
-                /* Instead of using default, pass in a decoder. */
-                return Charset.defaultCharset().decode(bb).toString();
+        	FileChannel fc = stream.getChannel();
+        	MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+        	/* Instead of using default, pass in a decoder. */
+        	return Charset.defaultCharset().decode(bb).toString();
         } 
-        finally 
-        {
-                stream.close();
+        finally{     
+        	stream.close();
         }
 	}
-	private void showsettings() {
-		startActivity(new Intent(this, preferences.class));
-	}
+	
 }

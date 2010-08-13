@@ -54,8 +54,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
-
 
 public class getnzb extends Activity {
 	public static final int MENU_PREFS = 0;
@@ -133,21 +131,18 @@ public class getnzb extends Activity {
     public void button_handler(View v){
     	switch(v.getId()){
     	case R.id.button_login:
-    		if(preferences.getString("nzbsusername", "") == ""){
+    		if(preferences.getString("nzbsusername", "") == "")
     			showDialog(DIALOG_NO_NZBS_SETTINGS);
-    		}
     		else{
     			pd = ProgressDialog.show(getnzb.this, "http://www.nzbs.org", "Logging in, please wait...");
     			login();
     		}
     		break;
     	case R.id.button_hellanzb:
-    		if(preferences.getString("hellanzb_hostname", "")==""){
+    		if(preferences.getString("hellanzb_hostname", "")=="")
     			showDialog(DIALOG_NO_HELLANZB_SETTINGS);
-    		}
-    		else {
+    		else 
     			starthellanzb();
-    		}
     		break;
     	}
     }
@@ -160,7 +155,7 @@ public class getnzb extends Activity {
     	new Thread() {
 			public void run(){
 				
-				Log.d(tags.LOG,"* Login function started.");
+				Log.d(tags.LOG,"- login()");
 				SharedPreferences pref = getSharedPreferences(tags.PREFS, 0);
 				Log.d(tags.LOG,"Using login name: '"+pref.getString("nzbsusername", "No value given.")+"'");
 				HttpPost httppost = new HttpPost(tags.NZBS_LOGINPAGE);
@@ -175,9 +170,8 @@ public class getnzb extends Activity {
 					HttpResponse httpresponse = httpclient.execute(httppost);
 					HttpEntity entity = httpresponse.getEntity();
 					
-					if(entity != null){
-						entity.consumeContent();					
-					}
+					if(entity != null) entity.consumeContent();					
+					
 					List<Cookie> cookielist = httpclient.getCookieStore().getCookies();
 					// If we are logged in we got three cookies. A a php-sessionid, username and a id-hash.
 					if (cookielist.isEmpty()) {
@@ -191,25 +185,20 @@ public class getnzb extends Activity {
 			        }
 					
 				} catch (UnsupportedEncodingException e) {
-				
+					Log.d(tags.LOG,"login(): UnsupportedEncodingException: "+e.getMessage());
 				} catch (ClientProtocolException e) {
-				
+					Log.d(tags.LOG,"login(): ClientProtocolException: "+e.getMessage());
 				} catch (IOException e) {
-				
-				}
-			
+					Log.d(tags.LOG,"login(): IO Exception: "+e.getMessage());
+				}		
 				pd_handler.sendEmptyMessage(0);
 			}
     	}.start();
     }
 	final Handler pd_handler = new Handler(){
 		public void handleMessage(Message msg){
-			TextView statusbar = (TextView) findViewById(R.id.statusbar);
-			if(LOGGEDIN) statusbar.setText("Ready to search nzbs.org");
 			pd.dismiss();
-			if(LOGGEDIN){
-				startsearch();
-			}
+			if(LOGGEDIN) startsearch();		
 		}
 	};
     
@@ -226,7 +215,7 @@ public class getnzb extends Activity {
     }
 
     public void quit(){
-    	Log.d(tags.LOG,"Ending application.");
+    	Log.d(tags.LOG,"- quit(): Ending application.");
     	this.finish();
     }
 

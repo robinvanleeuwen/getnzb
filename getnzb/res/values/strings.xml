@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, main!</string>
-    <string name="app_name">getnzb</string>
+    <string name="app_name">GetNZB</string>
     <string name="preferences_nzbs_username">Username of nzbs.org account</string>
 	<string name="preferences_nzbs_username_default"></string>
 	<string name="preferences_nzbs_password">Password of nzbs.org account</string>
