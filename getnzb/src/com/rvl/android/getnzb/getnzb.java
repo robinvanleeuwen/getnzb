@@ -153,7 +153,7 @@ public class getnzb extends Activity {
 		startActivity(new Intent(this,hellanzb.class));
 	}
 	
-    public void startpreferences(){
+    public  void startpreferences(){
         startActivity(new Intent(this,preferences.class));
     }
 
