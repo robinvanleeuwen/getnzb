@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GetNZB</string>
+    <string name="about_version">GetNZB v 0.0</string>
+    <string name="about_description">GetNZB is an Android application for searching http://www.nzbs.org, retrieving .nzb files and uploading them to a HellaNZB server through XMLRPC commands.</string>
+    <string name="about_help_development">GetNZB is free software released under GPLv3. You can help develop this software by posting suggestions and/or bugreports on http://getnzb.googlecode.com</string>
+	<string name="about_author">(C) 2010 Robin van Leeuwen - robinvanleeuwen@gmail.com</string>
+	<string name="about_credits">Credits go to the authors of HellaDroid, XMLRPC and HTMLCleaner.</string>
+    
     <string name="preferences_nzbs_username">Username of nzbs.org account</string>
 	<string name="preferences_nzbs_username_default"></string>
 	<string name="preferences_nzbs_password">Password of nzbs.org account</string>

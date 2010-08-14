@@ -24,6 +24,7 @@ package com.rvl.android.getnzb;
  * 
 **/
 
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -54,14 +55,19 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 public class getnzb extends Activity {
+	
+	public static boolean LOGGEDIN = false;
+
 	public static final int MENU_PREFS = 0;
 	public static final int MENU_QUIT = 1;
-	public static boolean LOGGEDIN = false;
+	public static final int MENU_ABOUT = 2;
 	
 	public static final int DIALOG_NO_NZBS_SETTINGS=1;
 	public static final int DIALOG_NO_HELLANZB_SETTINGS=2;
+	public static final int DIALOG_ABOUT=3;
 	
 	public static DefaultHttpClient httpclient = new DefaultHttpClient();
 	
@@ -82,6 +88,7 @@ public class getnzb extends Activity {
     }
     
     public boolean onCreateOptionsMenu(Menu menu){
+    	menu.add(0, MENU_ABOUT, 0, "About");
 		menu.add(0, MENU_PREFS, 0, "Preferences");
 		menu.add(0, MENU_QUIT, 0, "Quit");
     	return true;
@@ -113,6 +120,13 @@ public class getnzb extends Activity {
 			.setNegativeButton("No", null);
 			alert = builder.create();
 			return alert;
+    	case DIALOG_ABOUT:
+    		builder.setTitle("About GetNZB");
+    		View about = getLayoutInflater().inflate(R.layout.about, null);
+			((TextView)about.findViewById(R.id.text_about_title)).setText("GetNZB v" + tags.VERSION);
+			builder.setView(about);
+			alert = builder.create();
+    		return alert;
     	}
     	return null;
     }
@@ -124,6 +138,9 @@ public class getnzb extends Activity {
     		return true;
     	case MENU_QUIT:
     		quit();
+    		return true;
+    	case MENU_ABOUT:
+    		showDialog(DIALOG_ABOUT);
     		return true;
     	}
     	return false;

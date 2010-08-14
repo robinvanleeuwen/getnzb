@@ -29,4 +29,6 @@ public class tags{
 	public static final String LOG = "GETNZB";
 	public static final String PREFS = "getnzb";
 	public static final String NZBS_LOGINPAGE = "http://www.nzbs.org/user.php";
+	public static final String VERSION = "0.1";
+
 }

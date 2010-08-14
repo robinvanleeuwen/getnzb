@@ -86,9 +86,9 @@ public class search extends Activity {
 	   	switch(v.getId()){
 	    	
 		   	case R.id.btn_search:
-		 			EditText ed = (EditText) findViewById(R.id.searchterm);		
-		 			SEARCHTERM = ed.getText().toString().trim().replaceAll(" ", "+");
-		 			new searchnzb().execute(SEARCHTERM); 		
+		 		EditText ed = (EditText) findViewById(R.id.searchterm);		
+		 		SEARCHTERM = ed.getText().toString().trim().replaceAll(" ", "+");
+		 		new searchnzb().execute(SEARCHTERM); 		
 	    		break;
 	    	case R.id.btn_next:
 	    		if(HITLIST.length == 25){
@@ -125,8 +125,7 @@ public class search extends Activity {
 	    
 	    @SuppressWarnings("unused")
 		private int n = -1;
-	    
-	    
+	      
 	    protected void onPreExecute(){
 	    	this.search_dialog.setMessage("Searching on nzbs.org and building list...");
 	    	this.search_dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
