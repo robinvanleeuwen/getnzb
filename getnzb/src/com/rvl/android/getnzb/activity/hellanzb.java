@@ -41,15 +41,22 @@ import com.rvl.android.getnzb.getnzb;
 import com.rvl.android.getnzb.tags;
 import android.app.Activity;
 import android.app.ProgressDialog;
+
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class hellanzb extends Activity {
@@ -60,6 +67,7 @@ public class hellanzb extends Activity {
 	public static HashMap<String,Object> hellareturn = null;
 	public static final int MENU_PREFS = 0;
 	public static final int MENU_QUIT = 1;
+	public static final int ITEM_DELETE = 0;
 	public static final int CONNECT_OK = 1;
 	public static final int CONNECT_FAILED_NO_SETTINGS = 2;
 	public static final int CONNECT_FAILED_OTHER = 3;
@@ -72,7 +80,35 @@ public class hellanzb extends Activity {
 		if(!CONNECTED) connect();
 		listfiles();
 	}
-		
+	
+	public void onCreateContextMenu(ContextMenu menu, View view,
+			ContextMenuInfo menuInfo) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.filelistmenu, menu);
+		super.onCreateContextMenu(menu, view, menuInfo);
+	}
+	
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		switch(item.getItemId()) {
+		case R.id.deletefile:
+			deletefile(info.id);
+			return true;
+		// case R.id.infofile:
+		// ToDo parse .nzb and display info.
+		// return true;
+		}
+		return false;
+	}
+	
+	public void deletefile(long id){
+		String filelist[] = fileList();
+		deleteFile(filelist[(int) id]);
+		Log.d(tags.LOG,"deletefile(): "+filelist[(int) id]);
+		Toast.makeText(this, "File Deleted", Toast.LENGTH_SHORT).show();
+		listfiles();
+	}
+	
 	public int connect(){
  		Log.d(tags.LOG,"- hellanzb.connect()");
 		Log.d(tags.LOG,"connect(): Getting preferences");
@@ -85,13 +121,9 @@ public class hellanzb extends Activity {
 		try {
 			Log.d(tags.LOG,"connecty(): Creating URI: "+hellahost + ":" + prefs.getString("hellanzb_port", "8760"));
 			uri = URI.create(hellahost + ":" + prefs.getString("hellanzb_port", "8760"));
-
 			Log.d(tags.LOG,"connect(): Creating Client");
 			client = new XMLRPCClient(uri.toURL());
-			
-			Log.d(tags.LOG,"Authenticating with:'"+prefs.getString("hellanzbpassword", "")+"'");
-			client.setBasicAuthentication("hellanzb", prefs.getString("hellanzbpassword",""));
-			
+			client.setBasicAuthentication("hellanzb", prefs.getString("hellanzbpassword",""));			
 			Log.d(tags.LOG,"connecty(): Calling 'aolsay'");
 			if(client.call("aolsay") != ""){
 				String message = "Connected";
@@ -123,12 +155,12 @@ public class hellanzb extends Activity {
     	
     	ListView itemlist = (ListView) findViewById(R.id.filelist01);
     	itemlist.setCacheColorHint(00000000);
-    			
+    	itemlist.setOnCreateContextMenuListener(this);
     	itemlist.setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View v, int position,
 					long id) {
-					String list[] = fileList();					
+					String list[] = fileList();	
 					new uploadfile(list[position]).execute(list[position]);
 			}	
     	});
@@ -136,10 +168,9 @@ public class hellanzb extends Activity {
     	itemlist.setAdapter(aa);
     	String list[] = fileList();
 		for(int c=0;c<list.length;c++){
-			items.add(list[c]);
-			Log.d(tags.LOG,"List of local files: "+list[c]); 
+			items.add(list[c]);	
 		}
-		
+		Log.d(tags.LOG,"Number of files in list: "+list.length); 
     	aa.notifyDataSetChanged();
     }
     

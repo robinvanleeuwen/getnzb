@@ -1,13 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<AbsoluteLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-  android:background="@drawable/background">
-<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/welcome" android:textStyle="bold" android:typeface="sans" android:textColor="#D6CBF2" android:textSize="25dip" android:layout_x="50dip" android:layout_y="70dip" android:text="Welcome to GetNZB"></TextView>
-<Button android:layout_height="50dip" android:layout_y="160dip" android:textStyle="bold" android:typeface="sans" android:id="@+id/button_login" android:onClick="button_handler" android:layout_width="170dip" android:layout_x="79dip" android:text="Search nzbs.org"></Button>
-
-<Button android:layout_y="230dip" android:layout_height="50dip" android:textStyle="bold" android:typeface="sans" android:id="@+id/button_hellanzb" android:onClick="button_handler" android:layout_width="170dip" android:layout_x="79dip" android:text="Manage .nzb files"></Button>
 
 
-</AbsoluteLayout>
+
+<RelativeLayout android:id="@+id/RelativeLayout01" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:background="@drawable/background"><TextView android:layout_height="wrap_content" 
+		  android:layout_width="wrap_content" 
+		  android:id="@+id/welcome" 
+		  android:textStyle="bold" 
+		  android:typeface="sans" 
+		  android:textColor="#D6CBF2" 
+		  android:textSize="25dip" 
+		  android:layout_y="30dip" 
+		  android:layout_centerHorizontal="true" 
+		  android:text="Welcome to" 
+		  android:paddingTop="20dip">
+</TextView><ImageView android:layout_width="wrap_content" 
+	android:layout_height="wrap_content" 
+	android:id="@+id/icon" 
+	android:src="@drawable/logo" 
+	android:layout_centerHorizontal="true" 
+	android:layout_below="@+id/welcome" 
+	android:paddingBottom="10dip" android:paddingTop="10dip">
+</ImageView><TextView android:layout_width="wrap_content" 
+	android:layout_height="wrap_content" 
+	android:layout_below="@+id/icon" 
+	android:id="@+id/apptitle" 
+	android:textColor="#D6CBF2" 
+	android:textSize="25dip" 
+	android:textStyle="bold" 
+	android:typeface="sans" 
+	android:text="GetNZB" 
+	android:layout_centerHorizontal="true" android:paddingBottom="40dip">
+</TextView><Button android:layout_height="50dip" 
+	android:textStyle="bold" 
+	android:typeface="sans"
+	android:id="@+id/button_login" 
+	android:onClick="button_handler" 
+	android:layout_width="170dip" 
+	android:text="Search nzbs.org" 
+	android:layout_y="210dip" 
+	android:layout_centerHorizontal="true" 
+	android:layout_below="@+id/apptitle" android:layout_x="100dip">
+</Button><ImageView android:layout_height="wrap_content" android:layout_below="@+id/button_login" android:layout_width="wrap_content" android:layout_centerHorizontal="true" android:id="@+id/spacer01" android:paddingBottom="15dip"></ImageView><Button android:textStyle="bold" 
+	android:typeface="sans" 
+	android:id="@+id/button_hellanzb" 
+	android:onClick="button_handler" 
+	android:layout_width="170dip" 
+	android:layout_x="79dip" 
+	android:text="Manage .nzb files" 
+	android:layout_centerHorizontal="true" 
+	android:layout_y="290dip" 
+	android:layout_height="50dip" android:layout_below="@+id/spacer01">
+</Button>
+</RelativeLayout>
