@@ -24,7 +24,6 @@ package com.rvl.android.getnzb;
  * 
 **/
 
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -97,6 +96,9 @@ public class getnzb extends Activity {
     protected Dialog onCreateDialog(int id){
     	switch(id){
     	case DIALOG_NO_NZBS_SETTINGS:
+    		/* Clear settings of previous alert dialogs */
+    		builder = new AlertDialog.Builder(this);
+    		
     		builder.setTitle("No nzbs.org account settings.")
 			.setMessage("Do you wish to enter account settings now?")
     		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -109,6 +111,9 @@ public class getnzb extends Activity {
 			alert = builder.create();
 			return alert;
 		case DIALOG_NO_HELLANZB_SETTINGS:
+			/* Clear settings of previous alert dialogs */
+    		builder = new AlertDialog.Builder(this);
+    		
     		builder.setTitle("No HellaNZB server settings.")
 			.setMessage("Do you wish to enter HellaNZB settings now?")
     		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -121,6 +126,9 @@ public class getnzb extends Activity {
 			alert = builder.create();
 			return alert;
     	case DIALOG_ABOUT:
+    		/* Clear settings of previous alert dialogs */
+    		builder = new AlertDialog.Builder(this);
+    		
     		builder.setTitle("About GetNZB");
     		View about = getLayoutInflater().inflate(R.layout.about, null);
 			((TextView)about.findViewById(R.id.text_about_title)).setText("GetNZB v" + tags.VERSION);
