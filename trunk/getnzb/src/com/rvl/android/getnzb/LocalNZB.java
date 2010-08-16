@@ -62,7 +62,7 @@ import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class HellaNZB extends Activity {
+public class LocalNZB extends Activity {
 
 	public static URI uri;
 	public static XMLRPCClient client;	
@@ -233,7 +233,7 @@ public class HellaNZB extends Activity {
 
 	private class uploadLocalFile extends AsyncTask<String, Void, Void>{
  		
-		ProgressDialog uploadDialog = new ProgressDialog(HellaNZB.this);
+		ProgressDialog uploadDialog = new ProgressDialog(LocalNZB.this);
 		String filename;
 		uploadLocalFile(final String name){
 			this.filename = name;
