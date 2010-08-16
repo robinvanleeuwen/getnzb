@@ -39,7 +39,6 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
-import com.rvl.android.getnzb.activity.*;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -56,7 +55,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-public class getnzb extends Activity {
+public class GetNZB extends Activity {
 	
 	public static boolean LOGGEDIN = false;
 
@@ -79,10 +78,10 @@ public class getnzb extends Activity {
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	Log.d(tags.LOG,"------ STARTING GETNZB ------");
+    	Log.d(Tags.LOG,"------ STARTING GETNZB ------");
     	super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
-        preferences = getSharedPreferences(tags.PREFS,0);
+        preferences = getSharedPreferences(Tags.PREFS,0);
         builder = new AlertDialog.Builder(this);
     }
     
@@ -93,6 +92,20 @@ public class getnzb extends Activity {
     	return true;
     }
     
+    public boolean onOptionsItemSelected(MenuItem item){
+    	switch (item.getItemId()){
+    	case MENU_PREFS:
+    		startPreferences();
+    		return true;
+    	case MENU_QUIT:
+    		quit();
+    		return true;
+    	case MENU_ABOUT:
+    		showDialog(DIALOG_ABOUT);
+    		return true;
+    	}
+    	return false;
+    }
     protected Dialog onCreateDialog(int id){
     	switch(id){
     	case DIALOG_NO_NZBS_SETTINGS:
@@ -103,7 +116,7 @@ public class getnzb extends Activity {
 			.setMessage("Do you wish to enter account settings now?")
     		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					startpreferences();
+					startPreferences();
 					return;
 				}
 			})
@@ -118,7 +131,7 @@ public class getnzb extends Activity {
 			.setMessage("Do you wish to enter HellaNZB settings now?")
     		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					startpreferences();
+					startPreferences();
 					return;
 				}
 			})
@@ -131,7 +144,7 @@ public class getnzb extends Activity {
     		
     		builder.setTitle("About GetNZB");
     		View about = getLayoutInflater().inflate(R.layout.about, null);
-			((TextView)about.findViewById(R.id.text_about_title)).setText("GetNZB v" + tags.VERSION);
+			((TextView)about.findViewById(R.id.textAboutTitle)).setText("GetNZB v" + Tags.VERSION);
 			builder.setView(about);
 			alert = builder.create();
     		return alert;
@@ -139,27 +152,14 @@ public class getnzb extends Activity {
     	return null;
     }
     
-    public boolean onOptionsItemSelected(MenuItem item){
-    	switch (item.getItemId()){
-    	case MENU_PREFS:
-    		startpreferences();
-    		return true;
-    	case MENU_QUIT:
-    		quit();
-    		return true;
-    	case MENU_ABOUT:
-    		showDialog(DIALOG_ABOUT);
-    		return true;
-    	}
-    	return false;
-    }
+
     public void button_handler(View v){
     	switch(v.getId()){
     	case R.id.button_login:
     		if(preferences.getString("nzbsusername", "") == "")
     			showDialog(DIALOG_NO_NZBS_SETTINGS);
     		else{
-    			pd = ProgressDialog.show(getnzb.this, "http://www.nzbs.org", "Logging in, please wait...");
+    			pd = ProgressDialog.show(GetNZB.this, "http://www.nzbs.org", "Logging in, please wait...");
     			login();
     		}
     		break;
@@ -167,7 +167,7 @@ public class getnzb extends Activity {
     		if(preferences.getString("hellanzb_hostname", "")=="")
     			showDialog(DIALOG_NO_HELLANZB_SETTINGS);
     		else 
-    			starthellanzb();
+    			startHellaNZB();
     		break;
     	}
     }
@@ -180,10 +180,10 @@ public class getnzb extends Activity {
     	new Thread() {
 			public void run(){
 				
-				Log.d(tags.LOG,"- login()");
-				SharedPreferences pref = getSharedPreferences(tags.PREFS, 0);
-				Log.d(tags.LOG,"Using login name: '"+pref.getString("nzbsusername", "No value given.")+"'");
-				HttpPost httppost = new HttpPost(tags.NZBS_LOGINPAGE);
+				Log.d(Tags.LOG,"- login()");
+				SharedPreferences pref = getSharedPreferences(Tags.PREFS, 0);
+				Log.d(Tags.LOG,"Using login name: '"+pref.getString("nzbsusername", "No value given.")+"'");
+				HttpPost post = new HttpPost(Tags.NZBS_LOGINPAGE);
 				
 				List<NameValuePair> nvp = new ArrayList<NameValuePair>(2);
 				nvp.add(new BasicNameValuePair("username",pref.getString("nzbsusername", "")));
@@ -191,30 +191,30 @@ public class getnzb extends Activity {
 				nvp.add(new BasicNameValuePair("action","dologin"));
 
 				try {
-					httppost.setEntity(new UrlEncodedFormEntity(nvp));
-					HttpResponse httpresponse = httpclient.execute(httppost);
-					HttpEntity entity = httpresponse.getEntity();
+					post.setEntity(new UrlEncodedFormEntity(nvp));
+					HttpResponse response = httpclient.execute(post);
+					HttpEntity entity = response.getEntity();
 					
 					if(entity != null) entity.consumeContent();					
 					
 					List<Cookie> cookielist = httpclient.getCookieStore().getCookies();
 					// If we are logged in we got three cookies. A a php-sessionid, username and a id-hash.
 					if (cookielist.isEmpty()) {
-			            Log.d(tags.LOG,"No cookies, not logged in.");
+			            Log.d(Tags.LOG,"No cookies, not logged in.");
 			        } else {
-			        	Log.d(tags.LOG,"Received "+cookielist.size()+" cookies: ");
+			        	Log.d(Tags.LOG,"Received "+cookielist.size()+" cookies: ");
 			            for (int i = 0; i < cookielist.size(); i++) {
-			                Log.d(tags.LOG,"- " + cookielist.get(i).toString());
+			                Log.d(Tags.LOG,"- " + cookielist.get(i).toString());
 			            }
 			            LOGGEDIN = true;
 			        }
 					
 				} catch (UnsupportedEncodingException e) {
-					Log.d(tags.LOG,"login(): UnsupportedEncodingException: "+e.getMessage());
+					Log.d(Tags.LOG,"login(): UnsupportedEncodingException: "+e.getMessage());
 				} catch (ClientProtocolException e) {
-					Log.d(tags.LOG,"login(): ClientProtocolException: "+e.getMessage());
+					Log.d(Tags.LOG,"login(): ClientProtocolException: "+e.getMessage());
 				} catch (IOException e) {
-					Log.d(tags.LOG,"login(): IO Exception: "+e.getMessage());
+					Log.d(Tags.LOG,"login(): IO Exception: "+e.getMessage());
 				}		
 				pd_handler.sendEmptyMessage(0);
 			}
@@ -223,24 +223,24 @@ public class getnzb extends Activity {
 	final Handler pd_handler = new Handler(){
 		public void handleMessage(Message msg){
 			pd.dismiss();
-			if(LOGGEDIN) startsearch();		
+			if(LOGGEDIN) startSearch();		
 		}
 	};
     
-	public void startsearch(){
-		startActivity(new Intent(this,search.class));
+	public void startSearch(){
+		startActivity(new Intent(this,Search.class));
 	}
 	
-	public void starthellanzb(){
-		startActivity(new Intent(this,hellanzb.class));
+	public void startHellaNZB(){
+		startActivity(new Intent(this,HellaNZB.class));
 	}
 	
-    public  void startpreferences(){
-        startActivity(new Intent(this,preferences.class));
+    public  void startPreferences(){
+        startActivity(new Intent(this,Preferences.class));
     }
 
     public void quit(){
-    	Log.d(tags.LOG,"- quit(): Ending application.");
+    	Log.d(Tags.LOG,"- quit(): Ending application.");
     	this.finish();
     }
 
