@@ -232,7 +232,7 @@ public class GetNZB extends Activity {
 	}
 	
 	public void startHellaNZB(){
-		startActivity(new Intent(this,HellaNZB.class));
+		startActivity(new Intent(this,LocalNZB.class));
 	}
 	
     public  void startPreferences(){

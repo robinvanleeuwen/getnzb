@@ -13,7 +13,7 @@
         </activity>
 	<activity android:name=".Preferences"></activity>
 	<activity android:name=".Search"></activity>
-	<activity android:name=".HellaNZB"></activity>
+	<activity android:name=".LocalNZB"></activity>
     </application>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-sdk android:minSdkVersion="7" />
