@@ -6,6 +6,6 @@
   android:background="@drawable/background">
   
 
-<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="HellaNZB Status" android:id="@+id/hellastatus" android:textStyle="bold" android:layout_x="8dip" android:layout_y="5dip" android:textColor="#D6CBF2"></TextView>
-<ListView android:layout_width="310dip" android:layout_x="5dip" android:id="@+id/filelist01" android:layout_y="50dip" android:layout_height="370dip"></ListView>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="HellaNZB Status" android:textStyle="bold" android:layout_x="8dip" android:layout_y="5dip" android:textColor="#D6CBF2" android:id="@+id/hellaStatus"></TextView>
+<ListView android:layout_width="310dip" android:layout_x="5dip" android:layout_y="50dip" android:layout_height="370dip" android:id="@+id/localFileList"></ListView>
 </AbsoluteLayout>

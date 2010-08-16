@@ -23,24 +23,24 @@
  * 
 **/
 
-package com.rvl.android.getnzb.activity;
+package com.rvl.android.getnzb;
 
-import com.rvl.android.getnzb.tags;
+import com.rvl.android.getnzb.Tags;
 
 import com.rvl.android.getnzb.*;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.util.Log;
 
-public class preferences extends PreferenceActivity {
+public class Preferences extends PreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
-		Log.d(tags.LOG, "Starting preference acticity");
+		Log.d(Tags.LOG, "Starting preference acticity");
 		super.onCreate(savedInstanceState);
-		getPreferenceManager().setSharedPreferencesName(tags.PREFS);
+		getPreferenceManager().setSharedPreferencesName(Tags.PREFS);
 		addPreferencesFromResource(R.layout.preferences);
 	}
 	protected void onDestroy() {
-		Log.d(tags.LOG,"Leaving preference activity.");
+		Log.d(Tags.LOG,"Leaving preference activity.");
 		super.onDestroy();
 	}
 	

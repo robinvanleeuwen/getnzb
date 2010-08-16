@@ -22,7 +22,7 @@
  * 
 **/
 
-package com.rvl.android.getnzb.activity;
+package com.rvl.android.getnzb;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -51,6 +51,8 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -61,40 +63,57 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.rvl.android.getnzb.R;
-import com.rvl.android.getnzb.getnzb;
-import com.rvl.android.getnzb.tags;
+import com.rvl.android.getnzb.GetNZB;
+import com.rvl.android.getnzb.Tags;
 
 
 
-public class search extends Activity {
-	private DefaultHttpClient httpclient = getnzb.httpclient;
-	private boolean LOGGEDIN = getnzb.LOGGEDIN;
+public class Search extends Activity {
+	private DefaultHttpClient httpclient = GetNZB.httpclient;
+	private boolean LOGGEDIN = GetNZB.LOGGEDIN;
 	public static String HITLIST[][];
 	public boolean ENABLE_NEXTBUTTON = true;
 	public String SEARCHTERM = "";
 	public int CURRENT_PAGE = 1; 	// Start searching on page 1
-	
+	public static final int MENU_GETCART = 0;
 	protected void onCreate(Bundle savedInstanceState) {
-		Log.d(tags.LOG, "- Starting search activity -");
+		Log.d(Tags.LOG, "- Starting search activity -");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.search);
 		TextView statusbar = (TextView) findViewById(R.id.statusbar);
 		statusbar.setText("Enter searchterm.");
 		
 	}
+	
+    public boolean onCreateOptionsMenu(Menu menu){
+    	menu.add(0, MENU_GETCART, 0, "Get Cart");
+    	return true;
+    }
+	
+    public boolean onOptionsItemSelected(MenuItem item){
+    	switch (item.getItemId()){
+    	case MENU_GETCART:
+    		getcart();
+    		return true;
+    	}
+    	return false;
+    }
+    public void getcart(){
+    	
+    }
 	public void btn_handler(View v){
 	   	switch(v.getId()){
 	    	
 		   	case R.id.btn_search:
 		 		EditText ed = (EditText) findViewById(R.id.searchterm);		
 		 		SEARCHTERM = ed.getText().toString().trim().replaceAll(" ", "+");
-		 		new searchnzb().execute(SEARCHTERM); 		
+		 		new searchNZB().execute(SEARCHTERM); 		
 	    		break;
 	    	case R.id.btn_next:
 	    		if(HITLIST.length == 25){
 	    			HITLIST = null;
 	    			CURRENT_PAGE++;
-	    			new searchnzb().execute(SEARCHTERM);
+	    			new searchNZB().execute(SEARCHTERM);
 	    		}
 	    		else{
 	    			TextView statusbar = (TextView) findViewById(R.id.statusbar);
@@ -104,7 +123,7 @@ public class search extends Activity {
 	    	case R.id.btn_previous:
 	    		HITLIST = null;
 	    		if(CURRENT_PAGE > 1) CURRENT_PAGE--;
-	    		new searchnzb().execute(SEARCHTERM);
+	    		new searchNZB().execute(SEARCHTERM);
 	    		break;
 	    	case R.id.btn_backtosearch:
 	    		HITLIST = null;
@@ -117,35 +136,35 @@ public class search extends Activity {
 	    	}
 	}
 	
-	// searchnzb() searches nzbs.org and reads the supplied HTML page with HTMLCleaner
+	// searchNZB() searches nzbs.org and reads the supplied HTML page with HTMLCleaner
 	// to build a list of nzb-files (links) that can be sent to the HellaNZB server.	
-	private class searchnzb extends AsyncTask<String, Void, Void>{
+	private class searchNZB extends AsyncTask<String, Void, Void>{
 		    
-	    ProgressDialog search_dialog = new ProgressDialog(search.this);
+	    ProgressDialog searchDialog = new ProgressDialog(Search.this);
 	    
 	    @SuppressWarnings("unused")
 		private int n = -1;
 	      
 	    protected void onPreExecute(){
-	    	this.search_dialog.setMessage("Searching on nzbs.org and building list...");
-	    	this.search_dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-	    	this.search_dialog.show();
-	    	Log.d(tags.LOG, "Searching nzbs.org...");
+	    	this.searchDialog.setMessage("Searching on nzbs.org and building list...");
+	    	this.searchDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+	    	this.searchDialog.show();
+	    	Log.d(Tags.LOG, "Searching nzbs.org...");
 	    }
 	    protected Void doInBackground(final String... args){
-	    	Log.d(tags.LOG,"* Starting searchnzb():");
+	    	Log.d(Tags.LOG,"* Starting searchNZB():");
    			if(!LOGGEDIN){
-				Log.d(tags.LOG, "Search: Not logged in...");
+				Log.d(Tags.LOG, "Search: Not logged in...");
 				return null;
 			}
 			String url = "";			
 			url  = "http://www.nzbs.org/index.php?action=search&q=";
 			url += args[0];
 			url += "&catid=0&age=&page="+Integer.toString(CURRENT_PAGE);
-			Log.d(tags.LOG,"Constructed URL:"+url);
+			Log.d(Tags.LOG,"Constructed URL:"+url);
 			try {
 				int progresscounter = 5;
-				this.search_dialog.setProgress(progresscounter);
+				this.searchDialog.setProgress(progresscounter);
 	    		
 				HtmlCleaner cleaner = new HtmlCleaner();
 				CleanerProperties props = cleaner.getProperties();
@@ -153,41 +172,42 @@ public class search extends Activity {
 				props.setAllowMultiWordAttributes(true);
 				props.setRecognizeUnicodeChars(true);
 				props.setOmitComments(true);
-    
+				Log.d(Tags.LOG,"URL:"+url.toString());
 				HttpGet httpget = new HttpGet(url);
 				HttpResponse httpresponse = httpclient.execute(httpget);
 				HttpEntity entity = httpresponse.getEntity();
+			
 				
 			    progresscounter += 5;
-				this.search_dialog.setProgress(progresscounter);
+				this.searchDialog.setProgress(progresscounter);
 	
-				Log.d(tags.LOG,"Data retrieved, parsing items...");
+				Log.d(Tags.LOG,"Data rerieved, parsing items...");
+				
+				String xpathLink = "";
+				String xpathRows = "//table[@id='nzbtable']/tbody";			
 				TagNode node = cleaner.clean(new InputStreamReader(entity.getContent()));
+				Object[] nzbTable = node.evaluateXPath(xpathRows);
 				
-				String xpath_link = "";
-				String xpath_rows = "//table[@id='nzbtable']/tbody";			
-				Object[] nzbtable = node.evaluateXPath(xpath_rows);
-				this.n = nzbtable.length;
-				
-				TagNode row = (TagNode) nzbtable[0];
-				
+				this.n = nzbTable.length;
+				Log.d(Tags.LOG,"N="+Integer.toString(this.n));
+				TagNode row = (TagNode) nzbTable[0];
 				int numhits = row.getChildren().size() - 3;
 				
 				// Check if there is a next-page...
-				// if so, the button is enabled in build_item_list()
+				// if so, the button is enabled in buildItemList()
 				// since we can't do it in this thread (non-UI-operations only)...
-				Log.d(tags.LOG,"Checking if next button needs to be disabled.");
+				Log.d(Tags.LOG,"Checking if next button needs to be disabled.");
 				
 				if(numhits < 25){
-					Log.d(tags.LOG,"Disabling next-button");
+					Log.d(Tags.LOG,"Disabling next-button");
 					ENABLE_NEXTBUTTON = false;
 				}
 				else{
-					Log.d(tags.LOG,"Enabling next-button");
+					Log.d(Tags.LOG,"Enabling next-button");
 					ENABLE_NEXTBUTTON = true;							
 				}
 				
-				Log.d(tags.LOG,"Found "+Integer.toString(numhits)+" items. Adding them to list.");
+				Log.d(Tags.LOG,"Found "+Integer.toString(numhits)+" items. Adding them to list.");
 				this.n = numhits;
 				int counterincrement = 88 / numhits;
 				String[][] hit = new String[numhits][4];
@@ -197,13 +217,13 @@ public class search extends Activity {
 				TagNode atag;
 				
 				progresscounter += 5;
-				this.search_dialog.setProgress(progresscounter);
+				this.searchDialog.setProgress(progresscounter);
 				for(int c=0;c<numhits;c++){
-					xpath_rows = "//table[@id='nzbtable']/tbody/tr["+Integer.toString(c+3)+"]";
-					nzbtable = node.evaluateXPath(xpath_rows);				
+					xpathRows = "//table[@id='nzbtable']/tbody/tr["+Integer.toString(c+3)+"]";
+					nzbTable = node.evaluateXPath(xpathRows);				
 	
 					// Name
-					row = (TagNode) nzbtable[0];
+					row = (TagNode) nzbTable[0];
 					a = (TagNode) row.getChildren().get(1);
 					b = (TagNode) a.getChildren().get(0);
 					hit[c][0] = b.getText().toString();
@@ -217,28 +237,28 @@ public class search extends Activity {
 					hit[c][2] = a.getText().toString();
 
 					// Download link
-					xpath_link = xpath_rows+"/td[8]/b/a";
-					Object[] link     = node.evaluateXPath(xpath_link);
+					xpathLink = xpathRows+"/td[8]/b/a";
+					Object[] link     = node.evaluateXPath(xpathLink);
 					atag = (TagNode) link[0];
 					hit[c][3] = atag.getAttributeByName("href").replaceAll("&amp;", "&"); 
 					progresscounter += counterincrement;
-					this.search_dialog.setProgress(progresscounter);
-					Log.d(tags.LOG,"Item "+Integer.toString(c+1)+" added...");
+					this.searchDialog.setProgress(progresscounter);
+					Log.d(Tags.LOG,"Item "+Integer.toString(c+1)+" added...");
 				}
 				
 				HITLIST = hit;
 			
 			} catch (MalformedURLException e) {
-				Log.d(tags.LOG,"searchnzb: malformed url exception: "+e.getMessage());
+				Log.d(Tags.LOG,"searchNZB: malformed url exception: "+e.getMessage());
 			} catch (IOException e) {
-				Log.d(tags.LOG,"searchnzb: IO exception: "+e.getMessage());
+				Log.d(Tags.LOG,"searchNZB: IO exception: "+e.getMessage());
 			} catch (XPatherException e) {
-				Log.d(tags.LOG,"searchnzb: XPatherException: "+e.getMessage());
+				Log.d(Tags.LOG,"searchNZB: XPatherException: "+e.getMessage());
 			}
    			return null;
 	    }
 		protected void onPostExecute(final Void unused){
-    		this.search_dialog.dismiss();
+    		this.searchDialog.dismiss();
     		TextView statusbar = (TextView) findViewById(R.id.statusbar);
     		// String num_hits = Integer.toString(hitlist.length);
     		// String num_hits = "test";
@@ -246,20 +266,20 @@ public class search extends Activity {
     		if(!LOGGEDIN){
     			status = "Not logged in! Check NZB account settings..."; 
     			statusbar.setText(status);
-    			Log.d(tags.LOG,"* searchnzb() ended.");
+    			Log.d(Tags.LOG,"* searchNZB() ended.");
     		}
     		else{
-    			Log.d(tags.LOG,"* searchnzb() ended.");
-       			build_item_list();
+    			Log.d(Tags.LOG,"* searchNZB() ended.");
+       			buildItemList();
     		}		
 		}
 	}
-    public void build_item_list(){
+    public void buildItemList(){
     	String hits[][] = HITLIST;
     	
     	setContentView(R.layout.links);
     	String item = "";
-    	Log.d(tags.LOG, "* build_item_list()");
+    	Log.d(Tags.LOG, "* buildItemList()");
     	// -- Bind the itemlist to the itemarray with the arrayadapter
     	ArrayList<String> items = new ArrayList<String>();
     	ArrayAdapter<String> aa = new ArrayAdapter<String>(this,com.rvl.android.getnzb.R.layout.itemslist,items);
@@ -271,14 +291,14 @@ public class search extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View v, int position,
 					long id) {
 					String pos = Integer.toString(position);
-					Log.d(tags.LOG,"Sending download command for position "+pos);
+					Log.d(Tags.LOG,"Sending download command for position "+pos);
 					new downloadfile().execute(pos); 					
 			}
     	});
     	   	
     	itemlist.setAdapter(aa);
     	// --
-		Log.d(tags.LOG, "Building hitlist...");
+		Log.d(Tags.LOG, "Building hitlist...");
 
     	for(int i=0;i<hits.length;i++){
     		item += hits[i][0] + " / " + hits[i][1] + " / " + hits[i][2];
@@ -294,12 +314,12 @@ public class search extends Activity {
     }
         		
 	protected void onDestroy() {
-		Log.d(tags.LOG,"Leaving search activity.");
+		Log.d(Tags.LOG,"Leaving search activity.");
 		super.onDestroy();
 	}
     
     private class downloadfile extends AsyncTask<String, Void, Void>{
-    	ProgressDialog sdc_dialog = new ProgressDialog(search.this);
+    	ProgressDialog sdc_dialog = new ProgressDialog(Search.this);
     
     	protected void onPreExecute(){
     		this.sdc_dialog.setMessage("Downloading .nzb file...");
@@ -320,7 +340,7 @@ public class search extends Activity {
     			  HttpResponse r = httpclient.execute(getter);
     			  Header[] headers = r.getAllHeaders();
     			  
-    			  for(Header header: headers) Log.d(tags.LOG, header.getName()+": "+header.getValue());
+    			  for(Header header: headers) Log.d(Tags.LOG, header.getName()+": "+header.getValue());
     			
     			  HttpEntity entity = r.getEntity();
     			  String filename = HITLIST[position][0]+".nzb";
@@ -328,11 +348,11 @@ public class search extends Activity {
     		
     				  InputStream is = entity.getContent();
     				  
-    				  Log.d(tags.LOG, "Saving file:"+filename); 
-    				  Log.d(tags.LOG, "In directory:"+getFilesDir());
+    				  Log.d(Tags.LOG, "Saving file:"+filename); 
+    				  Log.d(Tags.LOG, "In directory:"+getFilesDir());
     				  FileOutputStream out = openFileOutput(filename,Activity.MODE_WORLD_WRITEABLE);
     		
-    				  Log.d(tags.LOG, "Created output file...");
+    				  Log.d(Tags.LOG, "Created output file...");
     				  byte buf[] = new byte[1024];
     				  int len;
     				  int i=0;
@@ -340,24 +360,24 @@ public class search extends Activity {
     					  i++;
     					  out.write(buf, 0, len);
     				  }
-    				  Log.d(tags.LOG, "Done writing (wrote "+i*1024+" bytes)...");
+    				  Log.d(Tags.LOG, "Done writing (wrote "+i*1024+" bytes)...");
     				  out.close();
     				  is.close();
     				  String list[] = fileList();
     				  for(int c=0;c<list.length;c++){
-    					 Log.d(tags.LOG,"List of local files: "+list[c]); 
+    					 Log.d(Tags.LOG,"List of local files: "+list[c]); 
     					 
     				  }
     			  }
     
     		} catch (UnsupportedEncodingException e) {
-    			Log.d(tags.LOG,"Unsupported Encoding Exception: "+e.getMessage());
+    			Log.d(Tags.LOG,"Unsupported Encoding Exception: "+e.getMessage());
     		} catch (ClientProtocolException e) {
-    			Log.d(tags.LOG, "Client Protocol Exception: "+e.getMessage());
+    			Log.d(Tags.LOG, "Client Protocol Exception: "+e.getMessage());
     		} catch (IOException e) {	
-    			Log.d(tags.LOG, "IO Exception: "+e.getMessage());
+    			Log.d(Tags.LOG, "IO Exception: "+e.getMessage());
     		} catch (URISyntaxException e) {
-    			Log.d(tags.LOG, "URI Syntax exception: "+e.getMessage());
+    			Log.d(Tags.LOG, "URI Syntax exception: "+e.getMessage());
 			}
     		return null;
     	}

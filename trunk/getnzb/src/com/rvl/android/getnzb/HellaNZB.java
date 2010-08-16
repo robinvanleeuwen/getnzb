@@ -22,7 +22,7 @@
  * 
 **/
 
-package com.rvl.android.getnzb.activity;
+package com.rvl.android.getnzb;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,11 +34,14 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import org.xmlrpc.android.XMLRPCClient;
 import org.xmlrpc.android.XMLRPCException;
 import com.rvl.android.getnzb.R;
-import com.rvl.android.getnzb.getnzb;
-import com.rvl.android.getnzb.tags;
+
+import com.rvl.android.getnzb.GetNZB;
+import com.rvl.android.getnzb.Tags;
 import android.app.Activity;
 import android.app.ProgressDialog;
 
@@ -59,7 +62,7 @@ import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class hellanzb extends Activity {
+public class HellaNZB extends Activity {
 
 	public static URI uri;
 	public static XMLRPCClient client;	
@@ -74,11 +77,11 @@ public class hellanzb extends Activity {
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.d(tags.LOG,"- Starting HellaNZB Activity!");	
+		Log.d(Tags.LOG,"- Starting HellaNZB Activity!");	
 		setContentView(R.layout.hellanzb);
 		
-		if(!CONNECTED) connect();
-		listfiles();
+		if(!CONNECTED) hellaConnect();
+		listLocalFiles();
 	}
 	
 	public void onCreateContextMenu(ContextMenu menu, View view,
@@ -90,9 +93,9 @@ public class hellanzb extends Activity {
 	
 	public boolean onContextItemSelected(MenuItem item) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-		switch(item.getItemId()) {
-		case R.id.deletefile:
-			deletefile(info.id);
+		switch(item.getItemId()){
+		case R.id.deleteLocalFile:
+			deleteLocalFile(info.id);
 			return true;
 		// case R.id.infofile:
 		// ToDo parse .nzb and display info.
@@ -101,30 +104,30 @@ public class hellanzb extends Activity {
 		return false;
 	}
 	
-	public void deletefile(long id){
-		String filelist[] = fileList();
-		deleteFile(filelist[(int) id]);
-		Log.d(tags.LOG,"deletefile(): "+filelist[(int) id]);
+	public void deleteLocalFile(long id){
+		String localFiles[] = fileList();
+		deleteFile(localFiles[(int) id]);
+		Log.d(Tags.LOG,"deleteLocalFile(): "+localFiles[(int) id]);
 		Toast.makeText(this, "File Deleted", Toast.LENGTH_SHORT).show();
-		listfiles();
+		listLocalFiles();
 	}
 	
-	public int connect(){
- 		Log.d(tags.LOG,"- hellanzb.connect()");
-		Log.d(tags.LOG,"connect(): Getting preferences");
-		SharedPreferences prefs = getnzb.preferences;
-		String hellahost = prefs.getString("hellanzb_hostname", "");
-		TextView statusbar = (TextView) findViewById(R.id.hellastatus);
+	public int hellaConnect(){
+ 		Log.d(Tags.LOG,"- hellanzb.hellaConnect()");
+		Log.d(Tags.LOG,"hellaConnect(): Getting preferences");
+		SharedPreferences prefs = GetNZB.preferences;
+		String hellaHost = prefs.getString("hellanzb_hostname", "");
+		TextView statusbar = (TextView) findViewById(R.id.hellaStatus);
 		
-		if(!hellahost.matches("(https?)://.+")) 
-			hellahost = "http://" + hellahost;
+		if(!hellaHost.matches("(https?)://.+")) 
+			hellaHost = "http://" + hellaHost;
 		try {
-			Log.d(tags.LOG,"connecty(): Creating URI: "+hellahost + ":" + prefs.getString("hellanzb_port", "8760"));
-			uri = URI.create(hellahost + ":" + prefs.getString("hellanzb_port", "8760"));
-			Log.d(tags.LOG,"connect(): Creating Client");
+			Log.d(Tags.LOG,"hellaConnecty(): Creating URI: "+hellaHost + ":" + prefs.getString("hellanzb_port", "8760"));
+			uri = URI.create(hellaHost + ":" + prefs.getString("hellanzb_port", "8760"));
+			Log.d(Tags.LOG,"hellaConnect(): Creating Client");
 			client = new XMLRPCClient(uri.toURL());
 			client.setBasicAuthentication("hellanzb", prefs.getString("hellanzbpassword",""));			
-			Log.d(tags.LOG,"connecty(): Calling 'aolsay'");
+			Log.d(Tags.LOG,"hellaConnecty(): Calling 'aolsay'");
 			if(client.call("aolsay") != ""){
 				String message = "Connected";
 				statusbar.setText(message);
@@ -133,145 +136,149 @@ public class hellanzb extends Activity {
 			}
 			
 		} catch (MalformedURLException e) {
-			Log.d(tags.LOG,"connect() failed: MalformedURLException:"+e.getMessage());
+			Log.d(Tags.LOG,"hellaConnect() failed: MalformedURLException:"+e.getMessage());
 			return CONNECT_FAILED_OTHER;
 		} catch (XMLRPCException e) {
-			Log.d(tags.LOG,"connect() failed: XMLRPCException:"+e.getMessage());
+			Log.d(Tags.LOG,"hellaConnect() failed: XMLRPCException:"+e.getMessage());
 			return CONNECT_FAILED_OTHER;
 		}
 		return CONNECT_FAILED_OTHER;
 	}
 		
-    public void listfiles(){
-    	if(!CONNECTED) connect();
-    	Log.d(tags.LOG, "- hellanzb.listfiles()");
+    public void listLocalFiles(){
+    	if(!CONNECTED) hellaConnect();
+    	Log.d(Tags.LOG, "- hellanzb.listLocalFiles()");
     	setContentView(R.layout.hellanzb);
-    	TextView statusbar = (TextView) findViewById(R.id.hellastatus);
+    	TextView statusbar = (TextView) findViewById(R.id.hellaStatus);
     	statusbar.setText("Local files. Click to upload:");
     	
+    
     	// -- Bind the itemlist to the itemarray with the arrayadapter
     	ArrayList<String> items = new ArrayList<String>();
     	ArrayAdapter<String> aa = new ArrayAdapter<String>(this,com.rvl.android.getnzb.R.layout.itemslist,items);
     	
-    	ListView itemlist = (ListView) findViewById(R.id.filelist01);
+  	
+    	ListView itemlist = (ListView) findViewById(R.id.localFileList);
     	itemlist.setCacheColorHint(00000000);
     	itemlist.setOnCreateContextMenuListener(this);
+   
     	itemlist.setOnItemClickListener(new OnItemClickListener(){
+	
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View v, int position,
 					long id) {
-					String list[] = fileList();	
-					new uploadfile(list[position]).execute(list[position]);
+					String localFiles[] = fileList();	
+					new uploadLocalFile(localFiles[position]).execute(localFiles[position]);
 			}	
     	});
     	   	
     	itemlist.setAdapter(aa);
-    	String list[] = fileList();
-		for(int c=0;c<list.length;c++){
-			items.add(list[c]);	
+    	String localFiles[] = fileList();
+		for(int c=0;c<localFiles.length;c++){
+			items.add(localFiles[c]);
 		}
-		Log.d(tags.LOG,"Number of files in list: "+list.length); 
+		Log.d(Tags.LOG,"Number of files in list: "+localFiles.length); 
     	aa.notifyDataSetChanged();
     }
     
-	public Object hellanzbcall(String command) {
- 		Log.d(tags.LOG,"- hellanzb.hellanzbcall(c)");
+	public Object hellaNZBCall(String command) {
+ 		Log.d(Tags.LOG,"- hellanzb.hellaNZBCall(c)");
 		try {
 			if(CONNECTED) return client.call(command);
 			else{
-				Log.d(tags.LOG,"hellanzbcall(): Not connected, connecting first.");
-				connect();
+				Log.d(Tags.LOG,"hellaNZBCall(): Not hellaConnected, hellaConnecting first.");
+				hellaConnect();
 				return client.call(command);
 			}
 		} catch(XMLRPCException e) {
-			Log.e(tags.LOG, "hellanzbcall(): "+e.getMessage());
+			Log.e(Tags.LOG, "hellaNZBCall(): "+e.getMessage());
 			CONNECTED = false;
 		}
 		return null;
 	}
 
-	public Object hellanzbcall(String command, String extra1) {
- 		Log.d(tags.LOG,"- hellanzb.hellanzbcall(c,e)"); 	
+	public Object hellaNZBCall(String command, String extra1) {
+ 		Log.d(Tags.LOG,"- hellanzb.hellaNZBCall(c,e)"); 	
 		try {
 			if(CONNECTED) return client.call(command, extra1);
 			else{
-				Log.d(tags.LOG,"hellanzbcall(): Not connected, connecting first.");
-				connect();
+				Log.d(Tags.LOG,"hellaNZBCall(): Not connected, connecting first.");
+				hellaConnect();
 				return client.call(command, extra1);
 			}
 		} catch(XMLRPCException e) {
-			Log.e(tags.LOG, "hellanzbcall(): "+e.getMessage());
+			Log.e(Tags.LOG, "hellaNZBCall(): "+e.getMessage());
 			CONNECTED = false;
 		}
 		return null;
 	}
 	
-	public Object hellanzbcall(String command, String extra1, String extra2) {
- 		Log.d(tags.LOG,"- hellanzb.hellanzbcall(c,e,e)");
+	public Object hellaNZBCall(String command, String extra1, String extra2) {
+ 		Log.d(Tags.LOG,"- hellanzb.hellaNZBCall(c,e,e)");
 		try {
 			if(CONNECTED) {
 				return client.call(command, extra1, extra2);
 				
 			} else{
-				Log.d(tags.LOG,"hellanzbcall(): Not connected, connecting first.");
-				connect();
+				Log.d(Tags.LOG,"hellaNZBCall(): Not connected, connecting first.");
+				hellaConnect();
 				return client.call(command, extra1, extra2);
 			}
 		} catch(XMLRPCException e) {
-			Log.e(tags.LOG, "hellanzbcall(): "+e.getMessage());
+			Log.e(Tags.LOG, "hellaNZBCall(): "+e.getMessage());
 			CONNECTED = false;
 		}
 		return null;
 	}
 
-	private class uploadfile extends AsyncTask<String, Void, Void>{
+	private class uploadLocalFile extends AsyncTask<String, Void, Void>{
  		
-		ProgressDialog uploaddialog = new ProgressDialog(hellanzb.this);
+		ProgressDialog uploadDialog = new ProgressDialog(HellaNZB.this);
 		String filename;
-		uploadfile(final String name){
+		uploadLocalFile(final String name){
 			this.filename = name;
 		}
 		
 	   	protected void onPreExecute(){
-			Log.d(tags.LOG,"- hellanzb.uploadfile.preExecute()");
-    		this.uploaddialog.setMessage("Uploading '"+this.filename+"' to HellaNZB server...");
-    		this.uploaddialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-    		this.uploaddialog.show();
+			Log.d(Tags.LOG,"- hellanzb.uploadLocalFile.preExecute()");
+    		this.uploadDialog.setMessage("Uploading '"+this.filename+"' to HellaNZB server...");
+    		this.uploadDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+    		this.uploadDialog.show();
     	}
 		
 		@SuppressWarnings("unchecked")
 		@Override
 		protected Void doInBackground(String... params) {
-			Log.d(tags.LOG,"- hellanzb.uploadfile.doInBackground()");
+			Log.d(Tags.LOG,"- hellanzb.uploadLocalFile.doInBackground()");
 			String filename = params[0];
-			Log.d(tags.LOG,"Complete filename: "+getFilesDir()+"/"+filename);
+			Log.d(Tags.LOG,"Complete filename: "+getFilesDir()+"/"+filename);
 			File nzbfile = new File(getFilesDir()+"/"+filename);
 			String filedata;
 			try {
-				filedata = readfile(nzbfile);
+				filedata = readFile(nzbfile);
 				@SuppressWarnings("unused")
-				HashMap<String, Object> response = (HashMap<String, Object>) hellanzbcall("enqueue", nzbfile.getName(), filedata);
+				HashMap<String, Object> response = (HashMap<String, Object>) hellaNZBCall("enqueue", nzbfile.getName(), filedata);
 
 			} catch (IOException e) {
-				Log.d(tags.LOG,"uploadfile(): IOException: "+e.getMessage());
+				Log.d(Tags.LOG,"uploadLocalFile(): IOException: "+e.getMessage());
 			}
 			// Delete file after uploading...
-			Log.d(tags.LOG,"Deleting file:"+filename);
+			Log.d(Tags.LOG,"Deleting file:"+filename);
 			deleteFile(filename);
 			return null;
 		}
 		protected void onPostExecute(final Void unused){
-			Log.d(tags.LOG,"- hellanzb.uploadfile.onPostExecute()");
-			this.uploaddialog.dismiss();
+			Log.d(Tags.LOG,"- hellanzb.uploadLocalFile.onPostExecute()");
+			this.uploadDialog.dismiss();
     		// Reload file list...
-    		listfiles();
+    		listLocalFiles();
     		return;
 		}
 
 	}
 	
-	public static String readfile(File file) throws IOException {
-		Log.d(tags.LOG,"readfile(): Converting file to string. ("+file.getAbsolutePath()+")");
+	public static String readFile(File file) throws IOException {
+		Log.d(Tags.LOG,"readfile(): Converting file to string. ("+file.getAbsolutePath()+")");
         FileInputStream stream = new FileInputStream(file);
         try {
         	FileChannel fc = stream.getChannel();

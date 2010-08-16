@@ -5,14 +5,14 @@
   		<EditTextPreference 
 			android:key="nzbsusername" 
 			android:title="nzbs username" 
-			android:summary="@string/preferences_nzbs_username"
-			android:defaultValue="@string/preferences_nzbs_username_default"
+			android:summary="@string/preferencesNzbsUsername"
+			android:defaultValue="@string/preferencesNzbsUsernameDefault"
 			/>
   		<EditTextPreference 
 			android:key="nzbspassword" 
 			android:title="nzbs password" 
-			android:summary="@string/preferences_nzbs_password"
-			android:defaultValue="@string/preferences_nzbs_password_default"
+			android:summary="@string/preferencesNzbsPassword"
+			android:defaultValue="@string/preferencesNzbsPasswordDefault"
 			android:password="true"
 			/>
   </PreferenceCategory>
@@ -20,20 +20,20 @@
   		<EditTextPreference 
 			android:key="hellanzb_hostname" 
 			android:title="HellaNZB hostname" 
-			android:summary="@string/preferences_hellanzb_hostname"
-			android:defaultValue="@string/preferences_hellanzb_hostname_default"
+			android:summary="@string/preferencesHellaNZBHostname"
+			android:defaultValue="@string/preferencesHellaNZBHostnameDefault"
 			/>
   			<EditTextPreference 
 			android:key="hellanzbport" 
 			android:title="HellaNZB Port" 
-			android:summary="@string/preferences_hellanzb_port"
-			android:defaultValue="@string/preferences_hellanzb_port_default"
+			android:summary="@string/preferencesHellaNZBPort"
+			android:defaultValue="@string/preferencesHellaNZBPortDefault"
 			/>
   			<EditTextPreference 
 			android:key="hellanzbpassword" 
 			android:title="HellaNZB Password" 
-			android:summary="@string/preferences_hellanzb_password"
-			android:defaultValue="@string/preferences_hellanzb_password_default"
+			android:summary="@string/preferencesHellaNZBPassword"
+			android:defaultValue="@string/preferencesHellaNZBPasswordDefault"
 			android:password="true"
 			/>
   	
