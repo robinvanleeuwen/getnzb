@@ -58,7 +58,8 @@ import android.widget.TextView;
 public class GetNZB extends Activity {
 	
 	public static boolean LOGGEDIN = false;
-
+	public static boolean HELLACONNECTED = false;
+	
 	public static final int MENU_PREFS = 0;
 	public static final int MENU_QUIT = 1;
 	public static final int MENU_ABOUT = 2;
@@ -167,7 +168,7 @@ public class GetNZB extends Activity {
     		if(preferences.getString("hellanzb_hostname", "")=="")
     			showDialog(DIALOG_NO_HELLANZB_SETTINGS);
     		else 
-    			startHellaNZB();
+    			startLocalNZB();
     		break;
     	}
     }
@@ -231,7 +232,7 @@ public class GetNZB extends Activity {
 		startActivity(new Intent(this,Search.class));
 	}
 	
-	public void startHellaNZB(){
+	public void startLocalNZB(){
 		startActivity(new Intent(this,LocalNZB.class));
 	}
 	
