@@ -2,7 +2,5 @@
 <menu
   xmlns:android="http://schemas.android.com/apk/res/android">
     	<item 
-		android:id="@+id/deleteLocalFile" android:title="@string/localFileList_deleteFile"/>
-  	
-		
+		android:id="@+id/deleteLocalFile" android:title="@string/localFileList_deleteFile"/>	
 </menu>
