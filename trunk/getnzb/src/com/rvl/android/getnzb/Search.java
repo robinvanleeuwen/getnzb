@@ -47,6 +47,7 @@ import org.htmlcleaner.XPatherException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.database.Cursor;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -76,12 +77,15 @@ public class Search extends Activity {
 	public String SEARCHTERM = "";
 	public int CURRENT_PAGE = 1; 	// Start searching on page 1
 	public static final int MENU_GETCART = 0;
+    public NZBDatabase LocalNZBMetadata = new NZBDatabase(this);
+    
 	protected void onCreate(Bundle savedInstanceState) {
 		Log.d(Tags.LOG, "- Starting search activity -");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.search);
 		TextView statusbar = (TextView) findViewById(R.id.statusbar);
 		statusbar.setText("Enter searchterm.");
+
 		
 	}
 	
@@ -291,7 +295,7 @@ public class Search extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View v, int position,
 					long id) {
 					String pos = Integer.toString(position);
-					Log.d(Tags.LOG,"Sending download command for position "+pos);
+					Log.d(Tags.LOG,"Sending oad command for position "+pos);
 					new downloadfile().execute(pos); 					
 			}
     	});
@@ -319,7 +323,8 @@ public class Search extends Activity {
 	}
     
     private class downloadfile extends AsyncTask<String, Void, Void>{
-    	ProgressDialog sdc_dialog = new ProgressDialog(Search.this);
+    	//private static final Object[] String a = null;
+		ProgressDialog sdc_dialog = new ProgressDialog(Search.this);
     
     	protected void onPreExecute(){
     		this.sdc_dialog.setMessage("Downloading .nzb file...");
@@ -344,14 +349,44 @@ public class Search extends Activity {
     			
     			  HttpEntity entity = r.getEntity();
     			  String filename = HITLIST[position][0]+".nzb";
+    			  String age  = HITLIST[position][1];
+    			  String size = HITLIST[position][2];
+    			 
+    			  LocalNZBMetadata.openDatabase();
+    			  Log.d(Tags.LOG,"Inserting filename in database.");
+    		  			  	
+    			  String query = "INSERT INTO file ('_id','name') VALUES(null,'"+filename+"')";
+    			  Log.d(Tags.LOG,"downloadfile: NZBDatabase Query:"+query);
+    			  LocalNZBMetadata.myDatabase.execSQL(query);
+    			  
+    			  Log.d(Tags.LOG,"Retrieving _id of file.");
+				  Cursor cur = LocalNZBMetadata.myDatabase.query("file", new String[] {"_id","name"}, "name='"+filename+"'", null, null, null, null);
+				  int idIndex = cur.getColumnIndex("_id");
+    			  cur.moveToFirst();
+    			  int fileId = cur.getInt(idIndex);
+    			  Log.d(Tags.LOG,"File id is "+Integer.toString(fileId));
+    			  
+    			  Log.d(Tags.LOG,"Storing file metadata.");
+    			  query = "INSERT INTO meta (_id,file_id,category,age,size) VALUES (null,'"+fileId+"','','"+age+"','"+size+"')";
+    			  Log.d(Tags.LOG,query);
+    			  LocalNZBMetadata.myDatabase.execSQL(query);
+    			  
     			  if(entity != null){
     		
     				  InputStream is = entity.getContent();
-    				  
     				  Log.d(Tags.LOG, "Saving file:"+filename); 
     				  Log.d(Tags.LOG, "In directory:"+getFilesDir());
     				  FileOutputStream out = openFileOutput(filename,Activity.MODE_WORLD_WRITEABLE);
-    		
+    				  
+    				  // Update the DB with file metadata.
+    				  
+    			
+    				  int nameIndex = cur.getColumnIndex("name");
+    				  cur.moveToFirst();
+    				  do{
+    					  Log.d(Tags.LOG,"Found name: "+cur.getString(nameIndex));  					  
+    				  } while(cur.moveToNext());
+    				  			  
     				  Log.d(Tags.LOG, "Created output file...");
     				  byte buf[] = new byte[1024];
     				  int len;

@@ -69,7 +69,8 @@ public class GetNZB extends Activity {
 	public static final int DIALOG_ABOUT=3;
 	
 	public static DefaultHttpClient httpclient = new DefaultHttpClient();
-	
+    public NZBDatabase LocalNZBMetadata = new NZBDatabase(this);
+
 	ProgressDialog pd = null;
 	AlertDialog.Builder builder;
 	AlertDialog alert;
@@ -84,6 +85,7 @@ public class GetNZB extends Activity {
         setContentView(R.layout.login);
         preferences = getSharedPreferences(Tags.PREFS,0);
         builder = new AlertDialog.Builder(this);
+
     }
     
     public boolean onCreateOptionsMenu(Menu menu){
