@@ -182,7 +182,7 @@ public class GetNZB extends Activity {
     	
     	new Thread() {
 			public void run(){
-				
+				if(!LOGGEDIN){
 				Log.d(Tags.LOG,"- login()");
 				SharedPreferences pref = getSharedPreferences(Tags.PREFS, 0);
 				Log.d(Tags.LOG,"Using login name: '"+pref.getString("nzbsusername", "No value given.")+"'");
@@ -194,31 +194,32 @@ public class GetNZB extends Activity {
 				nvp.add(new BasicNameValuePair("action","dologin"));
 
 				try {
-					post.setEntity(new UrlEncodedFormEntity(nvp));
-					HttpResponse response = httpclient.execute(post);
-					HttpEntity entity = response.getEntity();
+						post.setEntity(new UrlEncodedFormEntity(nvp));
+						HttpResponse response = httpclient.execute(post);
+						HttpEntity entity = response.getEntity();
 					
-					if(entity != null) entity.consumeContent();					
+						if(entity != null) entity.consumeContent();					
 					
-					List<Cookie> cookielist = httpclient.getCookieStore().getCookies();
-					// If we are logged in we got three cookies. A a php-sessionid, username and a id-hash.
-					if (cookielist.isEmpty()) {
-			            Log.d(Tags.LOG,"No cookies, not logged in.");
-			        } else {
-			        	Log.d(Tags.LOG,"Received "+cookielist.size()+" cookies: ");
-			            for (int i = 0; i < cookielist.size(); i++) {
-			                Log.d(Tags.LOG,"- " + cookielist.get(i).toString());
-			            }
-			            LOGGEDIN = true;
-			        }
+						List<Cookie> cookielist = httpclient.getCookieStore().getCookies();
+						// If we are logged in we got three cookies. A a php-sessionid, username and a id-hash.
+						if (cookielist.isEmpty()) {
+							Log.d(Tags.LOG,"No cookies, not logged in.");
+						} else {
+							Log.d(Tags.LOG,"Received "+cookielist.size()+" cookies: ");
+							for (int i = 0; i < cookielist.size(); i++) {
+								Log.d(Tags.LOG,"- " + cookielist.get(i).toString());
+							}
+							LOGGEDIN = true;
+						}
 					
-				} catch (UnsupportedEncodingException e) {
-					Log.d(Tags.LOG,"login(): UnsupportedEncodingException: "+e.getMessage());
-				} catch (ClientProtocolException e) {
-					Log.d(Tags.LOG,"login(): ClientProtocolException: "+e.getMessage());
-				} catch (IOException e) {
-					Log.d(Tags.LOG,"login(): IO Exception: "+e.getMessage());
-				}		
+						} catch (UnsupportedEncodingException e) {
+							Log.d(Tags.LOG,"login(): UnsupportedEncodingException: "+e.getMessage());
+						} catch (ClientProtocolException e) {
+							Log.d(Tags.LOG,"login(): ClientProtocolException: "+e.getMessage());
+						} catch (IOException e) {
+							Log.d(Tags.LOG,"login(): IO Exception: "+e.getMessage());
+						}
+				}
 				pd_handler.sendEmptyMessage(0);
 			}
     	}.start();
