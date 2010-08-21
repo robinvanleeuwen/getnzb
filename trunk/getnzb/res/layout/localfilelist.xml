@@ -18,7 +18,7 @@
 		android:layout_width="wrap_content" 
 		android:layout_toRightOf="@+id/checkbox" 
 		android:layout_height="wrap_content" 
-		android:id="@+id/age" android:text="@+id/age">
+		android:id="@+id/age" android:text="@+id/age" android:textStyle="italic">
 	</TextView>
 	<TextView android:layout_below="@+id/filename"
 		android:textColor="#D6CBF2" 
@@ -28,7 +28,7 @@
 		android:paddingLeft="10dip" 
 		android:id="@+id/size" 
 		android:text="@+id/size" 
-		android:layout_marginRight="6dip">
+		android:layout_marginRight="6dip" android:textStyle="italic">
 	</TextView>
 
 

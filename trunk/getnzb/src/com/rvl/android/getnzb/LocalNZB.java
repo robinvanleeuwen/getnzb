@@ -105,7 +105,8 @@ public class LocalNZB extends Activity {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 		switch(item.getItemId()){
 		case R.id.deleteLocalFile:
-            deleteLocalFile(info.id);
+			
+            deleteLocalFileContextItem(info.id);
             return true;
             // case R.id.infofile:
             // ToDo parse .nzb and display info.
@@ -114,9 +115,10 @@ public class LocalNZB extends Activity {
 		return false;
 	}
 	
-	public void deleteLocalFile(long id){
+	public void deleteLocalFileContextItem(long id){
 		String localFiles[] = fileList();
 		deleteFile(localFiles[(int) id]);
+		removeFromDatabase(localFiles[(int) id]);
 		Log.d(Tags.LOG,"deleteLocalFile(): "+localFiles[(int) id]);
 		Toast.makeText(this, "File Deleted", Toast.LENGTH_SHORT).show();
 		listLocalFiles();
@@ -336,6 +338,7 @@ public class LocalNZB extends Activity {
 			}
 			// Delete file after uploading...
 			Log.d(Tags.LOG,"Deleting file:"+filename);
+			removeFromDatabase(filename);
 			deleteFile(filename);
 			return null;
 		}
@@ -347,6 +350,21 @@ public class LocalNZB extends Activity {
     		return;
 		}
 
+	}
+	public void removeFromDatabase(String filename){
+		LocalNZBMetadata.openDatabase();
+		// Get file _id
+		Cursor cur = LocalNZBMetadata.myDatabase.query("file", new String[] {"_id"}, "name='"+filename+"'",
+															 		   null,
+															 		   null, 
+															 		   null, 
+															 		   null);
+		if(cur.moveToFirst()){
+			Log.d(Tags.LOG,"Deleting file metadata.");
+			int idIndex = cur.getColumnIndex("_id");
+			LocalNZBMetadata.myDatabase.delete("file", "_id='"+cur.getString(idIndex)+"'", null);
+			LocalNZBMetadata.myDatabase.delete("meta", "file_id='"+cur.getString(idIndex)+"'", null);		
+		}
 	}
 	
 	public static String readFile(File file) throws IOException {
