@@ -45,11 +45,8 @@ import com.rvl.android.getnzb.Tags;
 import android.app.Activity;
 import android.app.ProgressDialog;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -117,9 +114,7 @@ public class LocalNZB extends Activity {
 	
 	public void deleteLocalFileContextItem(long id){
 		String localFiles[] = fileList();
-		deleteFile(localFiles[(int) id]);
-		removeFromDatabase(localFiles[(int) id]);
-		Log.d(Tags.LOG,"deleteLocalFile(): "+localFiles[(int) id]);
+		removeLocalNZBFile(localFiles[(int) id]);
 		Toast.makeText(this, "File Deleted", Toast.LENGTH_SHORT).show();
 		listLocalFiles();
 	}
@@ -325,7 +320,6 @@ public class LocalNZB extends Activity {
 		protected Void doInBackground(String... params) {
 			Log.d(Tags.LOG,"- localnzb.uploadLocalFile.doInBackground()");
 			String filename = params[0];
-			Log.d(Tags.LOG,"Complete filename: "+getFilesDir()+"/"+filename);
 			File nzbfile = new File(getFilesDir()+"/"+filename);
 			String filedata;
 			try {
@@ -337,9 +331,7 @@ public class LocalNZB extends Activity {
 				Log.d(Tags.LOG,"uploadLocalFile(): IOException: "+e.getMessage());
 			}
 			// Delete file after uploading...
-			Log.d(Tags.LOG,"Deleting file:"+filename);
-			removeFromDatabase(filename);
-			deleteFile(filename);
+			removeLocalNZBFile(filename);
 			return null;
 		}
 		protected void onPostExecute(final Void unused){
@@ -351,18 +343,26 @@ public class LocalNZB extends Activity {
 		}
 
 	}
+	// Wrapper for deleting file from LocalNZB list.
+	public void removeLocalNZBFile(String filename){
+		Log.d(Tags.LOG,"Removing file from database.");
+		removeFromDatabase(filename);
+		Log.d(Tags.LOG, "Removing file from storage.");
+		deleteFile(filename);		
+	}
 	public void removeFromDatabase(String filename){
 		LocalNZBMetadata.openDatabase();
 		// Get file _id
 		Cursor cur = LocalNZBMetadata.myDatabase.query("file", new String[] {"_id"}, "name='"+filename+"'",
-															 		   null,
-															 		   null, 
-															 		   null, 
-															 		   null);
+											 	       null,null,null,null);
 		if(cur.moveToFirst()){
-			Log.d(Tags.LOG,"Deleting file metadata.");
+			
 			int idIndex = cur.getColumnIndex("_id");
+			
+			Log.d(Tags.LOG,"removeFromDatabase(): Deleting file entry in DB (file).");
 			LocalNZBMetadata.myDatabase.delete("file", "_id='"+cur.getString(idIndex)+"'", null);
+			
+			Log.d(Tags.LOG,"removeFromDatabase(): Deleting file metadata in DB (meta).");
 			LocalNZBMetadata.myDatabase.delete("meta", "file_id='"+cur.getString(idIndex)+"'", null);		
 		}
 	}
