@@ -22,10 +22,11 @@ public class LocalNZBRowAdapter extends ArrayAdapter<String>{
 		LayoutInflater inflater = context.getLayoutInflater();
 		View row = inflater.inflate(R.layout.localfilelist, null);
 		final TextView filename = (TextView) row.findViewById(R.id.filename);
-		filename.setText(items.get(position));
+		String[] values = items.get(position).split("#");
+		filename.setText(values[2]);
 		
-		((TextView) row.findViewById(R.id.size)).setText("123 MB");
-		((TextView) row.findViewById(R.id.age)).setText("0.2 Days ago");
+		((TextView) row.findViewById(R.id.size)).setText(values[1]);
+		((TextView) row.findViewById(R.id.age)).setText(values[0]);
 
 		return row;
 	}

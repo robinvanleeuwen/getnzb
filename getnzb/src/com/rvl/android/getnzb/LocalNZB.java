@@ -79,7 +79,7 @@ public class LocalNZB extends Activity {
 	public static final int CONNECT_OK = 1;
 	public static final int CONNECT_FAILED_NO_SETTINGS = 2;
 	public static final int CONNECT_FAILED_OTHER = 3;
-	public static NZBDatabase LocalNZBMetadata;
+    public NZBDatabase LocalNZBMetadata = new NZBDatabase(this);
     
 	static ProgressDialog UPLOADDIALOG = null;
 	
@@ -88,8 +88,7 @@ public class LocalNZB extends Activity {
 		Log.d(Tags.LOG,"- Starting LocalNZB Activity!");	
 		setContentView(R.layout.localnzb);
 		if(!GetNZB.HELLACONNECTED) hellaConnect();
-        LocalNZBMetadata = new NZBDatabase(this);    
-    	LocalNZBMetadata.openDatabase();
+        
 		listLocalFiles();
 	}
 	
@@ -162,11 +161,19 @@ public class LocalNZB extends Activity {
     	setContentView(R.layout.localnzb);
     	TextView statusbar = (TextView) findViewById(R.id.hellaStatus);
     	statusbar.setText("Local files. Click to upload:");
+      	Log.d(Tags.LOG,"Opening database.");
+    	LocalNZBMetadata.openDatabase();
+    	Cursor cur;
+    	
     	
     	// -- Bind the itemlist to the itemarray with the arrayadapter
     	ArrayList<String> items = new ArrayList<String>();
  		ArrayAdapter<String> localFilesArrayAdapter =  new LocalNZBRowAdapter(this,items);
 
+    	// Open database and retrieve metadata.
+   
+ 		
+ 		
     	ListView localFilesListView = (ListView) findViewById(R.id.localFileList);
     	localFilesListView.setCacheColorHint(00000000);
     	localFilesListView.setAdapter(localFilesArrayAdapter);   
@@ -181,10 +188,39 @@ public class LocalNZB extends Activity {
                             new uploadLocalFile(localFilesArray[position]).execute(localFilesArray[position]);
             }       
     	});
-
+    	// Retrieve files from disc, retrieve metadata from DB,
+    	// combine this data and send it to the arrayadapter.
+    	Log.d(Tags.LOG,"Retrieving file metadata and building LocalNZB list.");
+    	String age = "";
+    	String size = "";
+    	String fileinfo = "";
     	String localFilesArray[] = fileList();
 		for(int c=0;c<localFilesArray.length;c++){
-			items.add(localFilesArray[c]);
+		   	cur = LocalNZBMetadata.myDatabase.query("file", new String[] {"_id","name"}, "name = '"+localFilesArray[c]+"'", null, null, null, null);
+		    if(cur.moveToFirst()){
+		    	//if there is a hit, retrieve metadata
+		    	int idIndex = cur.getColumnIndex("_id");
+		    	int file_id = cur.getInt(idIndex);
+		    	cur = LocalNZBMetadata.myDatabase.query("meta", new String[] {"age", "size"}, "file_id ='"+file_id+"'", null, null, null, null);
+		    	if(cur.moveToFirst()){
+		    		int ageIndex = cur.getColumnIndex("age");
+		    		int sizeIndex = cur.getColumnIndex("size");
+		    		age = cur.getString(ageIndex);
+		    		size = cur.getString(sizeIndex);
+		    	}
+		    	else{
+		    		// If there is no metadata for file set dummy metadata info.
+		    		age = "???";
+		    		size = "???";
+		    	}
+		    }
+		    else{
+		    	// If there is no file info in database set dummy info.
+		    	age = "???";
+   				size = "???";
+	    	 }
+			fileinfo = age + "#" + size + "#"+ localFilesArray[c];
+			items.add(fileinfo);
 		}
 		Log.d(Tags.LOG,"Number of files in list: "+localFilesArray.length);	
 		localFilesArrayAdapter.notifyDataSetChanged();
