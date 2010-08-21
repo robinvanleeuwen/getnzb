@@ -33,6 +33,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -60,6 +61,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -67,17 +69,17 @@ import com.rvl.android.getnzb.R;
 import com.rvl.android.getnzb.GetNZB;
 import com.rvl.android.getnzb.Tags;
 
-
-
 public class Search extends Activity {
 	private DefaultHttpClient httpclient = GetNZB.httpclient;
 	private boolean LOGGEDIN = GetNZB.LOGGEDIN;
 	public static String HITLIST[][];
 	public boolean ENABLE_NEXTBUTTON = true;
 	public String SEARCHTERM = "";
+	public String SEARCHCATEGORY = "0";
 	public int CURRENT_PAGE = 1; 	// Start searching on page 1
 	public static final int MENU_GETCART = 0;
     public NZBDatabase LocalNZBMetadata = new NZBDatabase(this);
+    public static HashMap<String,String> SEARCHCATEGORYHASHMAP = new HashMap<String,String>();
     
 	protected void onCreate(Bundle savedInstanceState) {
 		Log.d(Tags.LOG, "- Starting search activity -");
@@ -85,7 +87,7 @@ public class Search extends Activity {
 		setContentView(R.layout.search);
 		TextView statusbar = (TextView) findViewById(R.id.statusbar);
 		statusbar.setText("Enter searchterm.");
-
+		createSearchCategoryMapping();
 		
 	}
 	
@@ -111,13 +113,16 @@ public class Search extends Activity {
 		   	case R.id.btn_search:
 		 		EditText ed = (EditText) findViewById(R.id.searchterm);		
 		 		SEARCHTERM = ed.getText().toString().trim().replaceAll(" ", "+");
-		 		new searchNZB().execute(SEARCHTERM); 		
+		 		Spinner categorySpinner = (Spinner) findViewById(R.id.spinnerCategory);
+		 		SEARCHCATEGORY = SEARCHCATEGORYHASHMAP.get(categorySpinner.getSelectedItem().toString());
+		 		Log.d(Tags.LOG,"Searching in "+SEARCHCATEGORY);
+		 		new searchNZB().execute(SEARCHTERM, SEARCHCATEGORY); 		
 	    		break;
 	    	case R.id.btn_next:
 	    		if(HITLIST.length == 25){
 	    			HITLIST = null;
 	    			CURRENT_PAGE++;
-	    			new searchNZB().execute(SEARCHTERM);
+	    			new searchNZB().execute(SEARCHTERM, SEARCHCATEGORY);
 	    		}
 	    		else{
 	    			TextView statusbar = (TextView) findViewById(R.id.statusbar);
@@ -127,14 +132,14 @@ public class Search extends Activity {
 	    	case R.id.btn_previous:
 	    		HITLIST = null;
 	    		if(CURRENT_PAGE > 1) CURRENT_PAGE--;
-	    		new searchNZB().execute(SEARCHTERM);
+	    		new searchNZB().execute(SEARCHTERM, SEARCHCATEGORY);
 	    		break;
 	    	case R.id.btn_backtosearch:
 	    		HITLIST = null;
 	    		CURRENT_PAGE = 1;
 	    		setContentView(R.layout.search);
 	    		TextView statusbar = (TextView) findViewById(R.id.statusbar);
-	    		statusbar.setText("Enter searchterm.");
+	    		statusbar.setText("Enter searchterm and select category.");
 	    		break;
 
 	    	}
@@ -146,7 +151,6 @@ public class Search extends Activity {
 		    
 	    ProgressDialog searchDialog = new ProgressDialog(Search.this);
 	    
-	    @SuppressWarnings("unused")
 		private int n = -1;
 	      
 	    protected void onPreExecute(){
@@ -164,7 +168,8 @@ public class Search extends Activity {
 			String url = "";			
 			url  = "http://www.nzbs.org/index.php?action=search&q=";
 			url += args[0];
-			url += "&catid=0&age=&page="+Integer.toString(CURRENT_PAGE);
+			url += "&catid=" + args[1];
+			url += "&age=&page="+Integer.toString(CURRENT_PAGE);
 			Log.d(Tags.LOG,"Constructed URL:"+url);
 			try {
 				int progresscounter = 5;
@@ -351,24 +356,31 @@ public class Search extends Activity {
     			  String filename = HITLIST[position][0]+".nzb";
     			  String age  = HITLIST[position][1];
     			  String size = HITLIST[position][2];
-    			 
+    			
+    			  Log.d(Tags.LOG,"Inserting filename and metadata in database.");
+    			  
     			  LocalNZBMetadata.openDatabase();
-    			  Log.d(Tags.LOG,"Inserting filename in database.");
-    		  			  	
+    			  
+    			  // Insert filename in database.
     			  String query = "INSERT INTO file ('_id','name') VALUES(null,'"+filename+"')";
-    			  Log.d(Tags.LOG,"downloadfile: NZBDatabase Query:"+query);
     			  LocalNZBMetadata.myDatabase.execSQL(query);
     			  
-    			  Log.d(Tags.LOG,"Retrieving _id of file.");
-				  Cursor cur = LocalNZBMetadata.myDatabase.query("file", new String[] {"_id","name"}, "name='"+filename+"'", null, null, null, null);
+    			  // Retrieve file _id for the new file.
+				  Cursor cur = LocalNZBMetadata.myDatabase.query("file", 
+						  										new String[] {"_id","name"},
+						  										"name='"+filename+"'",
+						  										null, null, null, null);
 				  int idIndex = cur.getColumnIndex("_id");
     			  cur.moveToFirst();
     			  int fileId = cur.getInt(idIndex);
-    			  Log.d(Tags.LOG,"File id is "+Integer.toString(fileId));
     			  
-    			  Log.d(Tags.LOG,"Storing file metadata.");
-    			  query = "INSERT INTO meta (_id,file_id,category,age,size) VALUES (null,'"+fileId+"','','"+age+"','"+size+"')";
-    			  Log.d(Tags.LOG,query);
+    			  // Insert file metadata in database.
+    			  query = "INSERT INTO meta (_id,file_id,category,age,size) VALUES (null,'"
+    				  	  +fileId
+    				  	  +"','','"
+    				  	  +age+"','"
+    				  	  +size+"')";
+    			  
     			  LocalNZBMetadata.myDatabase.execSQL(query);
     			  
     			  if(entity != null){
@@ -398,11 +410,7 @@ public class Search extends Activity {
     				  Log.d(Tags.LOG, "Done writing (wrote "+i*1024+" bytes)...");
     				  out.close();
     				  is.close();
-    				  String list[] = fileList();
-    				  for(int c=0;c<list.length;c++){
-    					 Log.d(Tags.LOG,"List of local files: "+list[c]); 
-    					 
-    				  }
+
     			  }
     
     		} catch (UnsupportedEncodingException e) {
@@ -421,6 +429,40 @@ public class Search extends Activity {
     		return;
 		}
     	
+    }
+    public void createSearchCategoryMapping(){
+    	// Create search mapping for Category Spinner.
+		SEARCHCATEGORYHASHMAP.put("All Categories", "0");	
+		SEARCHCATEGORYHASHMAP.put("Movies","t2");
+		SEARCHCATEGORYHASHMAP.put("Movies-DVD","9");
+		SEARCHCATEGORYHASHMAP.put("Movies-WMV-HD","12");
+		SEARCHCATEGORYHASHMAP.put("Movies-x264","4");
+		SEARCHCATEGORYHASHMAP.put("Movies-XviD","2");
+		SEARCHCATEGORYHASHMAP.put("TV","t1");
+		SEARCHCATEGORYHASHMAP.put("TV-DVD","11");
+		SEARCHCATEGORYHASHMAP.put("TV-FGN","24");
+		SEARCHCATEGORYHASHMAP.put("TV-H264","22");
+		SEARCHCATEGORYHASHMAP.put("TV-x264","14");
+		SEARCHCATEGORYHASHMAP.put("TV-XviD","1");
+		SEARCHCATEGORYHASHMAP.put("XXX","t4");
+		SEARCHCATEGORYHASHMAP.put("XXX-DVD","13");
+		SEARCHCATEGORYHASHMAP.put("XXX-Pack","25");
+		SEARCHCATEGORYHASHMAP.put("XXX-WMV","21");
+		SEARCHCATEGORYHASHMAP.put("XXX-x264","23");
+		SEARCHCATEGORYHASHMAP.put("XXX-XviD","3");
+		SEARCHCATEGORYHASHMAP.put("PC","t5");
+		SEARCHCATEGORYHASHMAP.put("PC-0day","7");
+		SEARCHCATEGORYHASHMAP.put("PC-ISO","6");
+		SEARCHCATEGORYHASHMAP.put("PC-Mac","15");
+		SEARCHCATEGORYHASHMAP.put("Music","t3");
+		SEARCHCATEGORYHASHMAP.put("Music-MP3","5");
+		SEARCHCATEGORYHASHMAP.put("Music-Video","10");
+		SEARCHCATEGORYHASHMAP.put("Console","t6");
+		SEARCHCATEGORYHASHMAP.put("Console-NDS","19");
+		SEARCHCATEGORYHASHMAP.put("Console-PSP","16");
+		SEARCHCATEGORYHASHMAP.put("Console-Wii","17");
+		SEARCHCATEGORYHASHMAP.put("Console-XBox","8");
+		SEARCHCATEGORYHASHMAP.put("Console-XBox360","20");
     }
 	
 }

@@ -1,12 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<AbsoluteLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-  android:background="@drawable/background">
+
+<RelativeLayout android:id="@+id/RelativeLayout01" 
+android:layout_width="fill_parent" 
+android:layout_height="fill_parent" 
+xmlns:android="http://schemas.android.com/apk/res/android" 
+android:background="@drawable/background">
+
+<EditText android:layout_width="wrap_content" 
+android:layout_height="wrap_content" 
+android:id="@+id/searchterm" 
+android:width="250dip"></EditText>
+
+<Spinner android:layout_below="@+id/searchterm" 
+android:layout_height="wrap_content" 
+android:layout_width="fill_parent"
+android:entries="@array/searchCategory"
+android:id="@+id/spinnerCategory"></Spinner>
+ 
+ <TextView android:layout_height="wrap_content" 
+ android:layout_width="wrap_content" 
+ android:layout_alignBottom="@+id/RelativeLayout01" 
+ android:layout_alignParentBottom="true" 
+ android:id="@+id/statusbar" 
+ android:text="Enter a searchterm and select category." 
+ android:textStyle="bold"></TextView>
+ 
+ <Button android:layout_height="wrap_content" 
+ android:layout_width="wrap_content" 
+ android:layout_toRightOf="@+id/searchterm" 
+ android:width="70dip" android:text="Go..."
+ android:typeface="sans" android:id="@+id/btn_search"
+ android:textStyle="bold" android:onClick="btn_handler"></Button>
 
 
-<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_x="2dip" android:layout_y="410dip" android:id="@+id/statusbar" android:text="You are not logged in. Please log in." android:textColor="#D6CBF2"></TextView>
-<EditText android:layout_height="wrap_content" android:layout_x="2dip" android:layout_y="5dip" android:layout_width="250dip" android:id="@+id/searchterm"></EditText>
-<Button android:layout_height="wrap_content" android:layout_y="5dip" android:layout_x="250dip" android:layout_width="70dip" android:textStyle="bold" android:text="Go..." android:id="@+id/btn_search" android:onClick="btn_handler"></Button>
-</AbsoluteLayout>
+</RelativeLayout>
