@@ -167,9 +167,9 @@ public class GetNZB extends Activity {
     		}
     		break;
     	case R.id.button_hellanzb:
-    		if(preferences.getString("hellanzb_hostname", "")=="")
-    			showDialog(DIALOG_NO_HELLANZB_SETTINGS);
-    		else 
+    		//if(preferences.getString("hellanzb_hostname", "")=="")
+    		//	showDialog(DIALOG_NO_HELLANZB_SETTINGS);
+    		//else 
     			startLocalNZB();
     		break;
     	}

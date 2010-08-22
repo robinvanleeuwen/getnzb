@@ -11,13 +11,28 @@
 	<string name="preferencesNzbsUsernameDefault"></string>
 	<string name="preferencesNzbsPassword">Password of nzbs.org account</string>
 	<string name="preferencesNzbsPasswordDefault"></string>
+	
 	<string name="preferencesHellaNZBHostname">Hostname of HellaNZB server</string>
 	<string name="preferencesHellaNZBHostnameDefault"></string>
 	<string name="preferencesHellaNZBPort">HellaNZB server port</string>
 	<string name="preferencesHellaNZBPortDefault">8760</string>
 	<string name="preferencesHellaNZBPassword">Password of HellaNZB server</string>
-	<string name="preferencesHellaNZBPasswordDefault"></string>
+	
+	<string name="preferencesFTPHostname">Hostname of FTP server</string>
+	<string name="preferencesFTPHostnameDefault"></string>
+	<string name="preferencesFTPUsername">Username for FTP server</string>
+	<string name="preferencesFTPUsernameDefault"></string>
+	<string name="preferencesFTPPassword">Password for FTP server</string>
+	<string name="preferencesFTPPasswordDefault"></string>
+	<string name="preferencesFTPPort">Portnumber of FTP server</string>
+	<string name="preferencesFTPPortDefault">21</string>
+	<string name="preferencesFTPUploadPath">Upload file to directory</string>
+	<string name="preferencesFTPUploadPathDefault">~/</string>
+	
+	
+	
 	<string name="localFileList_deleteFile">Delete File</string>
 	<string name="localFileList_infoFile">File Information</string>
+	<string name="localFileList_uploadFTP">Upload to FTP server</string>
 
 </resources>
