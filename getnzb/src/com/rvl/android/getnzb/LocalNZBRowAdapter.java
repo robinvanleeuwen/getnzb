@@ -21,15 +21,14 @@ public class LocalNZBRowAdapter extends ArrayAdapter<String>{
 	public View getView(int position, View convertView, ViewGroup parent){
 		LayoutInflater inflater = context.getLayoutInflater();
 		View row = inflater.inflate(R.layout.localfilelist, null);
-		final TextView filename = (TextView) row.findViewById(R.id.filename);
 		String[] values = items.get(position).split("#");
-		filename.setText(values[2]);
-		
+	
+		((TextView) row.findViewById(R.id.filename)).setText(values[2]);
 		((TextView) row.findViewById(R.id.size)).setText(values[1]);
 		((TextView) row.findViewById(R.id.age)).setText(values[0]);
+		((TextView) row.findViewById(R.id.category)).setText(values[3]);
 
 		return row;
 	}
 
-	
 }

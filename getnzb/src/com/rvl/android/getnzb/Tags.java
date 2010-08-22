@@ -29,7 +29,7 @@ public class Tags{
 	public static final String LOG = "GETNZB";
 	public static final String PREFS = "getnzb";
 	public static final String NZBS_LOGINPAGE = "http://www.nzbs.org/user.php";
-	public static final String VERSION = "0.2";
+	public static final String VERSION = "0.3";
 	public static final String DBPATH = "/data/data/com.rvl.android.getnzb/databases/";
 	public static final String DBNAME = "LocalNZBMetadata.sqlite";
 	

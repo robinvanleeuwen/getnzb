@@ -157,7 +157,7 @@ public class LocalNZB extends Activity {
     	Log.d(Tags.LOG, "- localnzb.listLocalFiles()");
     	setContentView(R.layout.localnzb);
     	TextView statusbar = (TextView) findViewById(R.id.hellaStatus);
-    	statusbar.setText("Local files. Click to upload:");
+    	statusbar.setText("Local files. Click to upload to HellaNZB, long click for options:");
       	Log.d(Tags.LOG,"Opening database.");
     	LocalNZBMetadata.openDatabase();
     	Cursor cur;
@@ -167,10 +167,6 @@ public class LocalNZB extends Activity {
     	ArrayList<String> items = new ArrayList<String>();
  		ArrayAdapter<String> localFilesArrayAdapter =  new LocalNZBRowAdapter(this,items);
 
-    	// Open database and retrieve metadata.
-   
- 		
- 		
     	ListView localFilesListView = (ListView) findViewById(R.id.localFileList);
     	localFilesListView.setCacheColorHint(00000000);
     	localFilesListView.setAdapter(localFilesArrayAdapter);   
@@ -190,6 +186,7 @@ public class LocalNZB extends Activity {
     	Log.d(Tags.LOG,"Retrieving file metadata and building LocalNZB list.");
     	String age = "";
     	String size = "";
+    	String category = "";
     	String fileinfo = "";
     	String localFilesArray[] = fileList();
 		for(int c=0;c<localFilesArray.length;c++){
@@ -198,25 +195,29 @@ public class LocalNZB extends Activity {
 		    	//if there is a hit, retrieve metadata
 		    	int idIndex = cur.getColumnIndex("_id");
 		    	int file_id = cur.getInt(idIndex);
-		    	cur = LocalNZBMetadata.myDatabase.query("meta", new String[] {"age", "size"}, "file_id ='"+file_id+"'", null, null, null, null);
+		    	cur = LocalNZBMetadata.myDatabase.query("meta", new String[] {"age", "size", "category"}, "file_id ='"+file_id+"'", null, null, null, null);
 		    	if(cur.moveToFirst()){
 		    		int ageIndex = cur.getColumnIndex("age");
 		    		int sizeIndex = cur.getColumnIndex("size");
+		    		int catIndex = cur.getColumnIndex("category");
 		    		age = cur.getString(ageIndex);
 		    		size = cur.getString(sizeIndex);
+		    		category = cur.getString(catIndex);
 		    	}
 		    	else{
 		    		// If there is no metadata for file set dummy metadata info.
 		    		age = "???";
 		    		size = "???";
+		    		category = "???";
 		    	}
 		    }
 		    else{
 		    	// If there is no file info in database set dummy info.
 		    	age = "???";
    				size = "???";
+   				category = "???";
 	    	 }
-			fileinfo = age + "#" + size + "#"+ localFilesArray[c];
+			fileinfo = age + "#" + size + "#"+ localFilesArray[c] + "#" + category;
 			items.add(fileinfo);
 		}
 		Log.d(Tags.LOG,"Number of files in list: "+localFilesArray.length);	
