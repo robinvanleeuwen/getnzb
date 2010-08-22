@@ -219,7 +219,7 @@ public class Search extends Activity {
 				Log.d(Tags.LOG,"Found "+Integer.toString(numhits)+" items. Adding them to list.");
 				this.n = numhits;
 				int counterincrement = 88 / numhits;
-				String[][] hit = new String[numhits][4];
+				String[][] hit = new String[numhits][5];
 			
 				TagNode a;
 				TagNode b;
@@ -232,29 +232,36 @@ public class Search extends Activity {
 					nzbTable = node.evaluateXPath(xpathRows);				
 	
 					// Name
+					
 					row = (TagNode) nzbTable[0];
 					a = (TagNode) row.getChildren().get(1);
 					b = (TagNode) a.getChildren().get(0);
 					hit[c][0] = b.getText().toString();
-	
+					
+					// Category
+					a = (TagNode) row.getChildren().get(2);
+					b = (TagNode) a.getChildren().get(0);
+					hit[c][4] = b.getText().toString();
+					
 					// Days ago
 					a = (TagNode) row.getChildren().get(3);
 					hit[c][1] = a.getText().toString();
-	
+					
 					// Size
 					a = (TagNode) row.getChildren().get(4);    					
 					hit[c][2] = a.getText().toString();
-
 					// Download link
+					
 					xpathLink = xpathRows+"/td[8]/b/a";
 					Object[] link     = node.evaluateXPath(xpathLink);
 					atag = (TagNode) link[0];
 					hit[c][3] = atag.getAttributeByName("href").replaceAll("&amp;", "&"); 
+					
 					progresscounter += counterincrement;
 					this.searchDialog.setProgress(progresscounter);
-					Log.d(Tags.LOG,"Item "+Integer.toString(c+1)+" added...");
-				}
 				
+				}
+				Log.d(Tags.LOG,"Added "+Integer.toString(numhits)+" items to list.");
 				HITLIST = hit;
 			
 			} catch (MalformedURLException e) {
@@ -289,30 +296,38 @@ public class Search extends Activity {
     	setContentView(R.layout.links);
     	String item = "";
     	Log.d(Tags.LOG, "* buildItemList()");
+    	
     	// -- Bind the itemlist to the itemarray with the arrayadapter
     	ArrayList<String> items = new ArrayList<String>();
-    	ArrayAdapter<String> aa = new ArrayAdapter<String>(this,com.rvl.android.getnzb.R.layout.itemslist,items);
+    	ArrayAdapter<String> aa = new SearchResultRowAdapter(this,items);
+    	
+    	//ArrayAdapter<String> aa = new ArrayAdapter<String>(this,com.rvl.android.getnzb.R.layout.itemslist,items);
    
     	ListView itemlist = (ListView) findViewById(R.id.itemlist01);
     	itemlist.setCacheColorHint(00000000);
+    	itemlist.setAdapter(aa);
+    	registerForContextMenu(itemlist);
+    	
     	itemlist.setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View v, int position,
 					long id) {
 					String pos = Integer.toString(position);
-					Log.d(Tags.LOG,"Sending oad command for position "+pos);
+					Log.d(Tags.LOG,"Sending download command for position "+pos);
 					new downloadfile().execute(pos); 					
 			}
     	});
     	   	
-    	itemlist.setAdapter(aa);
+    	
     	// --
 		Log.d(Tags.LOG, "Building hitlist...");
 
     	for(int i=0;i<hits.length;i++){
-    		item += hits[i][0] + " / " + hits[i][1] + " / " + hits[i][2];
+    		item += hits[i][0] + "#" + hits[i][1] + "#" + hits[i][2] + "#" + hits[i][4];
     		items.add(item);
+    		Log.d(Tags.LOG,"item:"+item);
     		item = "";
+    		
     	}
     	aa.notifyDataSetChanged();
     
@@ -356,6 +371,7 @@ public class Search extends Activity {
     			  String filename = HITLIST[position][0]+".nzb";
     			  String age  = HITLIST[position][1];
     			  String size = HITLIST[position][2];
+    			  String category = HITLIST[position][4];
     			
     			  Log.d(Tags.LOG,"Inserting filename and metadata in database.");
     			  
@@ -376,8 +392,8 @@ public class Search extends Activity {
     			  
     			  // Insert file metadata in database.
     			  query = "INSERT INTO meta (_id,file_id,category,age,size) VALUES (null,'"
-    				  	  +fileId
-    				  	  +"','','"
+    				  	  +fileId+"','"
+    				  	  +category+"','"
     				  	  +age+"','"
     				  	  +size+"')";
     			  

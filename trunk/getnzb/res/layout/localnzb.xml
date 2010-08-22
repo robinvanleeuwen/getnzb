@@ -7,5 +7,5 @@
   
 
 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="HellaNZB Status" android:textStyle="bold" android:layout_x="8dip" android:layout_y="5dip" android:textColor="#D6CBF2" android:id="@+id/hellaStatus"></TextView>
-<ListView android:layout_width="310dip" android:layout_x="5dip" android:layout_y="50dip" android:layout_height="370dip" android:id="@+id/localFileList"></ListView>
+<ListView android:layout_width="310dip" android:layout_x="5dip" android:id="@+id/localFileList" android:layout_y="60dip" android:layout_height="360dip"></ListView>
 </AbsoluteLayout>

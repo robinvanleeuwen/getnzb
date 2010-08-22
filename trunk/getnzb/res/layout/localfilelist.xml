@@ -11,7 +11,7 @@
 		android:layout_toRightOf="@+id/checkbox" 
 		android:layout_height="wrap_content" 	
 		android:id="@+id/filename" 
-		android:text="@+id/filename" android:maxLines="1">
+		android:text="@+id/filename" android:maxLines="1" android:paddingRight="8dip">
 	</TextView>
 	<TextView android:layout_below="@+id/filename" 
 		android:textColor="#D6CBF2"
@@ -23,12 +23,10 @@
 	<TextView android:layout_below="@+id/filename"
 		android:textColor="#D6CBF2" 
 		android:layout_width="wrap_content" 
-		android:layout_toRightOf="@+id/age" 
 		android:layout_height="wrap_content" 
-		android:paddingLeft="10dip" 
 		android:id="@+id/size" 
 		android:text="@+id/size" 
-		android:layout_marginRight="6dip" android:textStyle="italic">
+		android:layout_marginRight="6dip" android:textStyle="italic" android:layout_centerHorizontal="true">
 	</TextView>
 
 
@@ -37,4 +35,5 @@
 
 
 
+<TextView android:layout_below="@+id/filename" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#D6CBF2" android:text="@+id/category" android:textStyle="italic" android:id="@+id/category" android:layout_alignParentRight="true" android:paddingRight="8dip"></TextView>
 </RelativeLayout>
