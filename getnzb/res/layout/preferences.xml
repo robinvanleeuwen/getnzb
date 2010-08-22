@@ -16,7 +16,7 @@
 			android:password="true"
 			/>
   </PreferenceCategory>
-  <PreferenceCategory android:title="www.nzbs.org preferences" >
+  <PreferenceCategory android:title="HellaNZB preferences" >
   		<EditTextPreference 
 			android:key="hellanzb_hostname" 
 			android:title="HellaNZB hostname" 
@@ -32,10 +32,43 @@
   			<EditTextPreference 
 			android:key="hellanzbpassword" 
 			android:title="HellaNZB Password" 
-			android:summary="@string/preferencesHellaNZBPassword"
-			android:defaultValue="@string/preferencesHellaNZBPasswordDefault"
+			android:summary="@string/preferencesFTPPassword"
+			android:defaultValue="@string/preferencesFTPPasswordDefault"
 			android:password="true"
 			/>
   	
   </PreferenceCategory>  
+  <PreferenceCategory android:title="FTP Server preferences" >
+  <EditTextPreference 
+			android:key="FTPHostname" 
+			android:title="Hostname FTP Server" 
+			android:summary="@string/preferencesFTPHostname"
+			android:defaultValue="@string/preferencesFTPHostnameDefault"
+			android:password="false" />
+  <EditTextPreference 
+			android:key="FTPPort" 
+			android:title="Port FTP Server" 
+			android:summary="@string/preferencesFTPPort"
+			android:defaultValue="@string/preferencesFTPPortDefault"
+			android:password="false" />
+   <EditTextPreference 
+			android:key="FTPUsername" 
+			android:title="Username FTP Server" 
+			android:summary="@string/preferencesFTPUsername"
+			android:defaultValue="@string/preferencesFTPUsernameDefault"
+			android:password="false" />
+   <EditTextPreference 
+			android:key="FTPPassword" 
+			android:title="Password FTP Server" 
+			android:summary="@string/preferencesFTPPassword"
+			android:defaultValue="@string/preferencesFTPPasswordDefault"
+			android:password="true" />		
+     <EditTextPreference 
+			android:key="FTPUploadPath" 
+			android:title="FTP Upload Path" 
+			android:summary="@string/preferencesFTPUploadPath"
+			android:defaultValue="@string/preferencesFTPUploadPathDefault"
+			android:password="false" />		
+  </PreferenceCategory>
+    
 </PreferenceScreen>

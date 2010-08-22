@@ -24,10 +24,12 @@
 
 package com.rvl.android.getnzb;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.SocketException;
 import java.net.URI;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -36,6 +38,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
 import org.xmlrpc.android.XMLRPCClient;
 import org.xmlrpc.android.XMLRPCException;
 import com.rvl.android.getnzb.R;
@@ -84,8 +88,10 @@ public class LocalNZB extends Activity {
 		super.onCreate(savedInstanceState);
 		Log.d(Tags.LOG,"- Starting LocalNZB Activity!");	
 		setContentView(R.layout.localnzb);
-		if(!GetNZB.HELLACONNECTED) hellaConnect();
-        
+		SharedPreferences prefs = GetNZB.preferences;
+		if(prefs.getString("hellanzb_hostname", "")==""){
+			Toast.makeText(this, "No HellaNZB settings. Upload to HellaNZB not possible.", Toast.LENGTH_LONG).show();
+		}
 		listLocalFiles();
 	}
 	
@@ -108,8 +114,72 @@ public class LocalNZB extends Activity {
             // case R.id.infofile:
             // ToDo parse .nzb and display info.
             // return true;
+		case R.id.uploadLocalFileFTP:
+			SharedPreferences prefs = GetNZB.preferences;
+			if(prefs.getString("FTPHostname", "")==""){
+				Toast.makeText(this, "No FTP settings. Upload to FTP server not possible.", Toast.LENGTH_LONG).show();
+			}
+			else{
+				uploadLocalFileFTPContextItem(info.id);
+			}
+			return true;
 		}
+		
 		return false;
+	}
+	public void uploadLocalFileFTPContextItem(long id){
+		String localFileList[] = fileList();
+		uploadLocalFileFTP(localFileList[(int) id]);
+		listLocalFiles();
+	}
+	public void uploadLocalFileFTP(String filename){
+		SharedPreferences prefs = GetNZB.preferences;
+		FTPClient ftp = new FTPClient();
+		String FTPHostname = prefs.getString("FTPHostname","");
+		String FTPUsername = prefs.getString("FTPUsername", "anonymous");
+		String FTPPassword = prefs.getString("FTPPassword","my@email.address");
+		String FTPPort     = prefs.getString("FTPPort","21");
+		String FTPUploadPath = prefs.getString("FTPUploadPath", "~/");
+		if(!FTPUploadPath.matches("$/")){
+			Log.d(Tags.LOG,"Adding trailing slash");
+			FTPUploadPath += "/";
+		}
+		String targetFile = FTPUploadPath+filename;
+		
+
+		try {
+			ftp.connect(FTPHostname,Integer.parseInt(FTPPort));
+			if(ftp.login(FTPUsername, FTPPassword)){
+
+				ftp.setFileType(FTP.BINARY_FILE_TYPE);
+				ftp.enterLocalPassiveMode();
+				File file = new File(getFilesDir()+"/"+filename);
+				BufferedInputStream buffIn = new BufferedInputStream(new FileInputStream(file));
+				Log.d(Tags.LOG,"Saving file to:"+targetFile);
+				if(ftp.storeFile(targetFile, buffIn)){
+					Log.d(Tags.LOG,"FTP: File should be uploaded. Replycode: "+Integer.toString(ftp.getReplyCode()));
+				}
+				else{
+					Log.d(Tags.LOG,"FTP: Could not upload file  Replycode: "+Integer.toString(ftp.getReplyCode()));
+				}
+				
+				buffIn.close();
+				ftp.logout();
+				ftp.disconnect();
+				
+				
+				
+				
+			}
+			else{
+				Log.d(Tags.LOG, "No ftp login");
+			}
+		} catch (SocketException e) {
+			Log.d(Tags.LOG,"ftp(): "+e.getMessage());
+		} catch (IOException e) {
+			Log.d(Tags.LOG,"ftp(): "+e.getMessage());
+		}
+		
 	}
 	
 	public void deleteLocalFileContextItem(long id){
@@ -119,12 +189,12 @@ public class LocalNZB extends Activity {
 		listLocalFiles();
 	}
 	
-	public  int hellaConnect(){
+	public static int hellaConnect(){
  		Log.d(Tags.LOG,"- localnzb.hellaConnect()");
 		Log.d(Tags.LOG,"hellaConnect(): Getting preferences");
 		SharedPreferences prefs = GetNZB.preferences;
 		String hellaHost = prefs.getString("hellanzb_hostname", "");
-		TextView statusbar = (TextView) findViewById(R.id.hellaStatus);
+		
 		
 		if(!hellaHost.matches("(https?)://.+")) 
 			hellaHost = "http://" + hellaHost;
@@ -136,8 +206,8 @@ public class LocalNZB extends Activity {
 			client.setBasicAuthentication("hellanzb", prefs.getString("hellanzbpassword",""));			
 			Log.d(Tags.LOG,"hellaConnecty(): Calling 'aolsay'");
 			if(client.call("aolsay") != ""){
-				String message = "Connected";
-				statusbar.setText(message);
+			
+				
 				GetNZB.HELLACONNECTED = true;
 				return CONNECT_OK;
 			}
@@ -153,7 +223,7 @@ public class LocalNZB extends Activity {
 	}
 		
     public void listLocalFiles(){
-    	if(!GetNZB.HELLACONNECTED) hellaConnect();
+    	
     	Log.d(Tags.LOG, "- localnzb.listLocalFiles()");
     	setContentView(R.layout.localnzb);
     	TextView statusbar = (TextView) findViewById(R.id.hellaStatus);
@@ -177,8 +247,15 @@ public class LocalNZB extends Activity {
             @Override
             public void onItemClick(AdapterView<?> arg0, View v, int position,
                             long id) {
-                            String localFilesArray[] = fileList();       
-                            new uploadLocalFile(localFilesArray[position]).execute(localFilesArray[position]);
+            				SharedPreferences prefs = GetNZB.preferences;
+            				if(prefs.getString("hellanzb_hostname", "")==""){
+            					Log.d(Tags.LOG,"NO HELLANZB !!!!!!!!!!!!!!!!!!!!");
+            					return;
+            				}
+            				else{
+            					String localFilesArray[] = fileList();       
+            					new uploadLocalFile(localFilesArray[position]).execute(localFilesArray[position]);
+            				}
             }       
     	});
     	// Retrieve files from disc, retrieve metadata from DB,
@@ -264,7 +341,7 @@ public class LocalNZB extends Activity {
 				
 			} else{
 				Log.d(Tags.LOG,"hellaNZBCall(): Not connected, connecting first.");
-				
+				hellaConnect();
 				return client.call(command, extra1, extra2);
 			}
 		} catch(XMLRPCException e) {
@@ -279,27 +356,7 @@ public class LocalNZB extends Activity {
 		}
 	};
 	
-	public static void test(final String file){
-		new Thread(){
-			public void run(){
-				
-				File nzbfile = new File(file);
-				String filedata;
-				try {
-					filedata = readFile(nzbfile);
-					@SuppressWarnings("unused")
-					HashMap<String, Object> response = (HashMap<String, Object>) hellaNZBCall("enqueue", nzbfile.getName(), filedata);
 
-				} catch (IOException e) {
-					Log.d(Tags.LOG,"uploadLocalFile(): IOException: "+e.getMessage());
-				}
-				// Delete file after uploading...
-				Log.d(Tags.LOG,"Deleting file:"+file);
-				uploadDialogHandler.sendEmptyMessage(0);
-			}
-			
-		}.start();
-	}
 
 	class uploadLocalFile extends AsyncTask<String, Void, Void>{
  		
@@ -314,12 +371,14 @@ public class LocalNZB extends Activity {
     		this.uploadDialog.setMessage("Uploading '"+this.filename+"' to HellaNZB server...");
     		this.uploadDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
     		this.uploadDialog.show();
+    		//if(!GetNZB.HELLACONNECTED) hellaConnect();
     	}
 		
 		@SuppressWarnings("unchecked")
 		@Override
 		protected Void doInBackground(String... params) {
 			Log.d(Tags.LOG,"- localnzb.uploadLocalFile.doInBackground()");
+			
 			String filename = params[0];
 			File nzbfile = new File(getFilesDir()+"/"+filename);
 			String filedata;
