@@ -17,11 +17,14 @@
 			/>
   </PreferenceCategory>
   <PreferenceCategory android:title="Upload method preferences">
- 		<EditTextPreference 
-			android:key="preferredUploadMethos" 
-			android:title="Preferred upload method." 
+ 		<ListPreference
+			android:key="preferredUploadMethod"
+			android:title="Upload method"
 			android:summary="@string/preferencesPreferredUploadMethod"
-			android:defaultValue="@string/preferencesPreferredUploadMethodDefault" />  
+			android:entries="@array/preferredUploadMethod"
+			android:entryValues="@array/preferredUploadMethod"
+			android:defaultValue="HellaNZB"
+			/>
   </PreferenceCategory>
   
   <PreferenceCategory android:title="HellaNZB preferences" >

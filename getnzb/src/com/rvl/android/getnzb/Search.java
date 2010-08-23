@@ -438,6 +438,7 @@ public class Search extends Activity {
     		} catch (URISyntaxException e) {
     			Log.d(Tags.LOG, "URI Syntax exception: "+e.getMessage());
 			}
+    		LocalNZBMetadata.close();
     		return null;
     	}
 		protected void onPostExecute(final Void unused){
