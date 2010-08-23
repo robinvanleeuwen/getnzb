@@ -80,9 +80,11 @@ public class LocalNZB extends Activity {
 	public static final int CONNECT_OK = 1;
 	public static final int CONNECT_FAILED_NO_SETTINGS = 2;
 	public static final int CONNECT_FAILED_OTHER = 3;
+	public static String UPLOADFILENAME = "";
     public NZBDatabase LocalNZBMetadata = new NZBDatabase(this);
     
 	static ProgressDialog UPLOADDIALOG = null;
+	
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -94,9 +96,7 @@ public class LocalNZB extends Activity {
 		}
 		listLocalFiles();
 	}
-	
-	
-	
+		
 	public void onCreateContextMenu(ContextMenu menu, View view,
             ContextMenuInfo menuInfo) {
 		MenuInflater inflater = getMenuInflater();
@@ -106,82 +106,89 @@ public class LocalNZB extends Activity {
 	
 	public boolean onContextItemSelected(MenuItem item) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		String localFileList[] = fileList();
 		switch(item.getItemId()){
+
 		case R.id.deleteLocalFile:
-			
             deleteLocalFileContextItem(info.id);
             return true;
-            // case R.id.infofile:
-            // ToDo parse .nzb and display info.
-            // return true;
+		case R.id.uploadLocalFileHellaNZB:
+			uploadLocalFileHellaNZB(localFileList[(int) info.id]);		
+			return true;
 		case R.id.uploadLocalFileFTP:
-			SharedPreferences prefs = GetNZB.preferences;
-			if(prefs.getString("FTPHostname", "")==""){
-				Toast.makeText(this, "No FTP settings. Upload to FTP server not possible.", Toast.LENGTH_LONG).show();
-			}
-			else{
-				uploadLocalFileFTPContextItem(info.id);
-			}
+			uploadLocalFileFTP(localFileList[(int) info.id]);
 			return true;
 		}
 		
 		return false;
 	}
-	public void uploadLocalFileFTPContextItem(long id){
-		String localFileList[] = fileList();
-		uploadLocalFileFTP(localFileList[(int) id]);
-		listLocalFiles();
-	}
-	public void uploadLocalFileFTP(String filename){
-		SharedPreferences prefs = GetNZB.preferences;
-		FTPClient ftp = new FTPClient();
-		String FTPHostname = prefs.getString("FTPHostname","");
-		String FTPUsername = prefs.getString("FTPUsername", "anonymous");
-		String FTPPassword = prefs.getString("FTPPassword","my@email.address");
-		String FTPPort     = prefs.getString("FTPPort","21");
-		String FTPUploadPath = prefs.getString("FTPUploadPath", "~/");
-		if(!FTPUploadPath.matches("$/")){
-			Log.d(Tags.LOG,"Adding trailing slash");
-			FTPUploadPath += "/";
-		}
-		String targetFile = FTPUploadPath+filename;
-		
-
-		try {
-			ftp.connect(FTPHostname,Integer.parseInt(FTPPort));
-			if(ftp.login(FTPUsername, FTPPassword)){
-
-				ftp.setFileType(FTP.BINARY_FILE_TYPE);
-				ftp.enterLocalPassiveMode();
-				File file = new File(getFilesDir()+"/"+filename);
-				BufferedInputStream buffIn = new BufferedInputStream(new FileInputStream(file));
-				Log.d(Tags.LOG,"Saving file to:"+targetFile);
-				if(ftp.storeFile(targetFile, buffIn)){
-					Log.d(Tags.LOG,"FTP: File should be uploaded. Replycode: "+Integer.toString(ftp.getReplyCode()));
-				}
-				else{
-					Log.d(Tags.LOG,"FTP: Could not upload file  Replycode: "+Integer.toString(ftp.getReplyCode()));
-				}
-				
-				buffIn.close();
-				ftp.logout();
-				ftp.disconnect();
-				
-				
-				
-				
-			}
-			else{
-				Log.d(Tags.LOG, "No ftp login");
-			}
-		} catch (SocketException e) {
-			Log.d(Tags.LOG,"ftp(): "+e.getMessage());
-		} catch (IOException e) {
-			Log.d(Tags.LOG,"ftp(): "+e.getMessage());
-		}
-		
-	}
 	
+	public void uploadLocalFileFTP(String filename){
+		UPLOADFILENAME = filename;
+		
+		UPLOADDIALOG = ProgressDialog.show(this, "Please wait...", "Uploading '"+filename+"' to FTP server.");
+		   		
+		SharedPreferences prefs = GetNZB.preferences;
+		if(prefs.getString("FTPHostname", "")==""){
+			uploadDialogHandler.sendEmptyMessage(0);
+			Toast.makeText(this, "No FTP settings. Upload to FTP server not possible.", Toast.LENGTH_LONG).show();
+			return;
+		}
+		
+		new Thread(){
+			
+		public void run(){
+			SharedPreferences prefs = GetNZB.preferences;
+			FTPClient ftp = new FTPClient();
+			String FTPHostname = prefs.getString("FTPHostname","");
+			String FTPUsername = prefs.getString("FTPUsername", "anonymous");
+			String FTPPassword = prefs.getString("FTPPassword","my@email.address");
+			String FTPPort     = prefs.getString("FTPPort","21");
+			String FTPUploadPath = prefs.getString("FTPUploadPath", "~/");
+			if(!FTPUploadPath.matches("$/")){
+				Log.d(Tags.LOG,"Adding trailing slash");
+				FTPUploadPath += "/";
+			}
+			String targetFile = FTPUploadPath+UPLOADFILENAME;
+			
+			try {
+				ftp.connect(FTPHostname,Integer.parseInt(FTPPort));
+				if(ftp.login(FTPUsername, FTPPassword)){
+
+					ftp.setFileType(FTP.BINARY_FILE_TYPE);
+					ftp.enterLocalPassiveMode();
+					File file = new File(getFilesDir()+"/"+UPLOADFILENAME);
+					BufferedInputStream buffIn = new BufferedInputStream(new FileInputStream(file));
+					Log.d(Tags.LOG,"Saving file to:"+targetFile);
+					if(ftp.storeFile(targetFile, buffIn)){
+						Log.d(Tags.LOG,"FTP: File should be uploaded. Replycode: "+Integer.toString(ftp.getReplyCode()));
+					}
+					else{
+						Log.d(Tags.LOG,"FTP: Could not upload file  Replycode: "+Integer.toString(ftp.getReplyCode()));
+					}
+				
+					buffIn.close();
+					ftp.logout();
+					ftp.disconnect();
+				
+					}
+					else{
+						Log.d(Tags.LOG, "No ftp login");
+					}
+				} catch (SocketException e) {
+					Log.d(Tags.LOG,"ftp(): "+e.getMessage());
+				} catch (IOException e) {
+					Log.d(Tags.LOG,"ftp(): "+e.getMessage());
+				}
+				removeLocalNZBFile(UPLOADFILENAME);
+				
+				UPLOADFILENAME = "";
+				uploadDialogHandler.sendEmptyMessage(0);
+			}
+		
+		}.start();
+	}
+
 	public void deleteLocalFileContextItem(long id){
 		String localFiles[] = fileList();
 		removeLocalNZBFile(localFiles[(int) id]);
@@ -194,8 +201,7 @@ public class LocalNZB extends Activity {
 		Log.d(Tags.LOG,"hellaConnect(): Getting preferences");
 		SharedPreferences prefs = GetNZB.preferences;
 		String hellaHost = prefs.getString("hellanzb_hostname", "");
-		
-		
+			
 		if(!hellaHost.matches("(https?)://.+")) 
 			hellaHost = "http://" + hellaHost;
 		try {
@@ -206,8 +212,7 @@ public class LocalNZB extends Activity {
 			client.setBasicAuthentication("hellanzb", prefs.getString("hellanzbpassword",""));			
 			Log.d(Tags.LOG,"hellaConnecty(): Calling 'aolsay'");
 			if(client.call("aolsay") != ""){
-			
-				
+							
 				GetNZB.HELLACONNECTED = true;
 				return CONNECT_OK;
 			}
@@ -231,8 +236,7 @@ public class LocalNZB extends Activity {
       	Log.d(Tags.LOG,"Opening database.");
     	LocalNZBMetadata.openDatabase();
     	Cursor cur;
-    	
-    	
+    	  	
     	// -- Bind the itemlist to the itemarray with the arrayadapter
     	ArrayList<String> items = new ArrayList<String>();
  		ArrayAdapter<String> localFilesArrayAdapter =  new LocalNZBRowAdapter(this,items);
@@ -247,17 +251,12 @@ public class LocalNZB extends Activity {
             @Override
             public void onItemClick(AdapterView<?> arg0, View v, int position,
                             long id) {
-            				SharedPreferences prefs = GetNZB.preferences;
-            				if(prefs.getString("hellanzb_hostname", "")==""){
-            					Log.d(Tags.LOG,"NO HELLANZB !!!!!!!!!!!!!!!!!!!!");
-            					return;
-            				}
-            				else{
             					String localFilesArray[] = fileList();       
-            					new uploadLocalFile(localFilesArray[position]).execute(localFilesArray[position]);
-            				}
+            					uploadLocalFileHellaNZB(localFilesArray[position]);
+            				
             }       
     	});
+    	
     	// Retrieve files from disc, retrieve metadata from DB,
     	// combine this data and send it to the arrayadapter.
     	Log.d(Tags.LOG,"Retrieving file metadata and building LocalNZB list.");
@@ -272,7 +271,9 @@ public class LocalNZB extends Activity {
 		    	//if there is a hit, retrieve metadata
 		    	int idIndex = cur.getColumnIndex("_id");
 		    	int file_id = cur.getInt(idIndex);
+		    	
 		    	cur = LocalNZBMetadata.myDatabase.query("meta", new String[] {"age", "size", "category"}, "file_id ='"+file_id+"'", null, null, null, null);
+		    	
 		    	if(cur.moveToFirst()){
 		    		int ageIndex = cur.getColumnIndex("age");
 		    		int sizeIndex = cur.getColumnIndex("size");
@@ -316,6 +317,7 @@ public class LocalNZB extends Activity {
 		}
 		return null;
 	}
+	
 
 	public Object hellaNZBCall(String command, String extra1) {
  		Log.d(Tags.LOG,"- localnzb.hellaNZBCall(c,e)"); 	
@@ -332,6 +334,7 @@ public class LocalNZB extends Activity {
 		}
 		return null;
 	}
+	
 	
 	public static Object hellaNZBCall(String command, String extra1, String extra2) {
  		Log.d(Tags.LOG,"- localnzb.hellaNZBCall(c,e,e)");
@@ -350,59 +353,49 @@ public class LocalNZB extends Activity {
 		}
 		return null;
 	}
-	final static Handler uploadDialogHandler = new Handler(){
+	
+	
+	final  Handler uploadDialogHandler = new Handler(){
 		public void handleMessage(Message msg){
-			UPLOADDIALOG.dismiss();	
+			// After uploading refresh the LocalNZB filelist.		
+			UPLOADDIALOG.dismiss();
+			listLocalFiles();
 		}
 	};
 	
-
-
-	class uploadLocalFile extends AsyncTask<String, Void, Void>{
- 		
-		ProgressDialog uploadDialog = new ProgressDialog(LocalNZB.this);
-		String filename;
-		uploadLocalFile(final String name){
-			this.filename = name;
+	public void uploadLocalFileHellaNZB(String filename){
+		UPLOADDIALOG = ProgressDialog.show(this, "Please wait...", "Uploading '"+filename+"' to HellaNZB server.");
+			   
+		UPLOADFILENAME = filename;
+		SharedPreferences prefs = GetNZB.preferences;
+		if(prefs.getString("hellanzb_hostname", "")==""){
+			uploadDialogHandler.sendEmptyMessage(0);
+			Toast.makeText(this, "No HellaNZB settings. Cannot upload to HellaNZB", Toast.LENGTH_LONG);
+			return;
 		}
-		
-	   	protected void onPreExecute(){
-			Log.d(Tags.LOG,"- localnzb.uploadLocalFile.preExecute()");
-    		this.uploadDialog.setMessage("Uploading '"+this.filename+"' to HellaNZB server...");
-    		this.uploadDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-    		this.uploadDialog.show();
-    		//if(!GetNZB.HELLACONNECTED) hellaConnect();
-    	}
-		
-		@SuppressWarnings("unchecked")
-		@Override
-		protected Void doInBackground(String... params) {
-			Log.d(Tags.LOG,"- localnzb.uploadLocalFile.doInBackground()");
-			
-			String filename = params[0];
-			File nzbfile = new File(getFilesDir()+"/"+filename);
-			String filedata;
-			try {
-				filedata = readFile(nzbfile);
-				@SuppressWarnings("unused")
-				HashMap<String, Object> response = (HashMap<String, Object>) hellaNZBCall("enqueue", nzbfile.getName(), filedata);
+		new Thread(){
+			@SuppressWarnings("unchecked")
+			public void run(){
+				Log.d(Tags.LOG,"- uploadLocalFileHellaNZB():");
+				File uploadfile = new File(getFilesDir()+"/"+UPLOADFILENAME);
+				String filedata;
+				try{
+					filedata = readFile(uploadfile);
+					@SuppressWarnings("unused")
+					HashMap<String, Object> response = (HashMap<String, Object>) hellaNZBCall("enqueue", uploadfile.getName(), filedata);
 
-			} catch (IOException e) {
-				Log.d(Tags.LOG,"uploadLocalFile(): IOException: "+e.getMessage());
+				}
+				catch (IOException e) {
+						Log.d(Tags.LOG,"uploadLocalFile(): IOException: "+e.getMessage());
+				}
+				removeLocalNZBFile(UPLOADFILENAME);
+				UPLOADFILENAME = "";
+				uploadDialogHandler.sendEmptyMessage(0);
 			}
-			// Delete file after uploading...
-			removeLocalNZBFile(filename);
-			return null;
-		}
-		protected void onPostExecute(final Void unused){
-			Log.d(Tags.LOG,"- localnzb.uploadLocalFile.onPostExecute()");
-			this.uploadDialog.dismiss();
-    		// Reload file list...
-    		listLocalFiles();
-    		return;
-		}
-
+			
+		}.start();
 	}
+
 	// Wrapper for deleting file from LocalNZB list.
 	public void removeLocalNZBFile(String filename){
 		Log.d(Tags.LOG,"Removing file from database.");
@@ -410,6 +403,7 @@ public class LocalNZB extends Activity {
 		Log.d(Tags.LOG, "Removing file from storage.");
 		deleteFile(filename);		
 	}
+	
 	public void removeFromDatabase(String filename){
 		LocalNZBMetadata.openDatabase();
 		// Get file _id
@@ -426,6 +420,7 @@ public class LocalNZB extends Activity {
 			LocalNZBMetadata.myDatabase.delete("meta", "file_id='"+cur.getString(idIndex)+"'", null);		
 		}
 	}
+	
 	
 	public static String readFile(File file) throws IOException {
 		Log.d(Tags.LOG,"readfile(): Converting file to string. ("+file.getAbsolutePath()+")");

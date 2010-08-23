@@ -16,6 +16,14 @@
 			android:password="true"
 			/>
   </PreferenceCategory>
+  <PreferenceCategory android:title="Upload method preferences">
+ 		<EditTextPreference 
+			android:key="preferredUploadMethos" 
+			android:title="Preferred upload method." 
+			android:summary="@string/preferencesPreferredUploadMethod"
+			android:defaultValue="@string/preferencesPreferredUploadMethodDefault" />  
+  </PreferenceCategory>
+  
   <PreferenceCategory android:title="HellaNZB preferences" >
   		<EditTextPreference 
 			android:key="hellanzb_hostname" 
