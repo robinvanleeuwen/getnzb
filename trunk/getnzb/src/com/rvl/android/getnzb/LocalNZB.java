@@ -90,10 +90,7 @@ public class LocalNZB extends Activity {
 		super.onCreate(savedInstanceState);
 		Log.d(Tags.LOG,"- Starting LocalNZB Activity!");	
 		setContentView(R.layout.localnzb);
-		SharedPreferences prefs = GetNZB.preferences;
-		if(prefs.getString("hellanzb_hostname", "")==""){
-			Toast.makeText(this, "No HellaNZB settings. Upload to HellaNZB not possible.", Toast.LENGTH_LONG).show();
-		}
+	
 		listLocalFiles();
 	}
 		
@@ -123,6 +120,42 @@ public class LocalNZB extends Activity {
 		return false;
 	}
 	
+	public void uploadLocalFileHellaNZB(String filename){
+		UPLOADDIALOG = ProgressDialog.show(this, "Please wait...", "Uploading '"+filename+"' to HellaNZB server.");
+			   
+		UPLOADFILENAME = filename;
+		SharedPreferences prefs = GetNZB.preferences;
+		if(prefs.getString("hellanzb_hostname", "")==""){
+			uploadDialogHandler.sendEmptyMessage(0);
+			Log.d(Tags.LOG,"No HellaNZB settings Toast");
+			Toast.makeText(this, "Upload to HellaNZB not possible, please check HellaNZB preferences.", Toast.LENGTH_LONG).show();
+			return;
+		}
+		new Thread(){
+			@SuppressWarnings("unchecked")
+			public void run(){
+				Log.d(Tags.LOG,"- uploadLocalFileHellaNZB():");
+				File uploadfile = new File(getFilesDir()+"/"+UPLOADFILENAME);
+				String filedata;
+				try{
+					filedata = readFile(uploadfile);
+					@SuppressWarnings("unused")
+					HashMap<String, Object> response = (HashMap<String, Object>) hellaNZBCall("enqueue", uploadfile.getName(), filedata);
+
+				}
+				catch (IOException e) {
+						Log.d(Tags.LOG,"uploadLocalFile(): IOException: "+e.getMessage());
+				}
+				removeLocalNZBFile(UPLOADFILENAME);
+				UPLOADFILENAME = "";
+				uploadDialogHandler.sendEmptyMessage(0);
+			}
+			
+		}.start();
+	}
+
+
+	
 	public void uploadLocalFileFTP(String filename){
 		UPLOADFILENAME = filename;
 		
@@ -131,7 +164,7 @@ public class LocalNZB extends Activity {
 		SharedPreferences prefs = GetNZB.preferences;
 		if(prefs.getString("FTPHostname", "")==""){
 			uploadDialogHandler.sendEmptyMessage(0);
-			Toast.makeText(this, "No FTP settings. Upload to FTP server not possible.", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "Upload to FTP server not possible. Please check FTP preferences.", Toast.LENGTH_LONG).show();
 			return;
 		}
 		
@@ -251,8 +284,20 @@ public class LocalNZB extends Activity {
             @Override
             public void onItemClick(AdapterView<?> arg0, View v, int position,
                             long id) {
-            					String localFilesArray[] = fileList();       
-            					uploadLocalFileHellaNZB(localFilesArray[position]);
+            					String localFilesArray[] = fileList();      
+            					SharedPreferences prefs = GetNZB.preferences;
+            					String preferredMethod = prefs.getString("preferredUploadMethod", "");
+            					
+            					if(preferredMethod.equals("HellaNZB")){
+            						Log.d(Tags.LOG,"itemclik(): uploading with HellaNZB.");
+            						uploadLocalFileHellaNZB(localFilesArray[position]);
+            						return;
+            					}
+            					if(preferredMethod.equals("FTP")){
+            						Log.d(Tags.LOG,"itemclick(): uploading with FTP.");
+            						uploadLocalFileFTP(localFilesArray[position]);
+            						return;
+            					}
             				
             }       
     	});
@@ -300,6 +345,7 @@ public class LocalNZB extends Activity {
 		}
 		Log.d(Tags.LOG,"Number of files in list: "+localFilesArray.length);	
 		localFilesArrayAdapter.notifyDataSetChanged();
+		LocalNZBMetadata.close();
     }
     
 	public Object hellaNZBCall(String command) {
@@ -363,39 +409,6 @@ public class LocalNZB extends Activity {
 		}
 	};
 	
-	public void uploadLocalFileHellaNZB(String filename){
-		UPLOADDIALOG = ProgressDialog.show(this, "Please wait...", "Uploading '"+filename+"' to HellaNZB server.");
-			   
-		UPLOADFILENAME = filename;
-		SharedPreferences prefs = GetNZB.preferences;
-		if(prefs.getString("hellanzb_hostname", "")==""){
-			uploadDialogHandler.sendEmptyMessage(0);
-			Toast.makeText(this, "No HellaNZB settings. Cannot upload to HellaNZB", Toast.LENGTH_LONG);
-			return;
-		}
-		new Thread(){
-			@SuppressWarnings("unchecked")
-			public void run(){
-				Log.d(Tags.LOG,"- uploadLocalFileHellaNZB():");
-				File uploadfile = new File(getFilesDir()+"/"+UPLOADFILENAME);
-				String filedata;
-				try{
-					filedata = readFile(uploadfile);
-					@SuppressWarnings("unused")
-					HashMap<String, Object> response = (HashMap<String, Object>) hellaNZBCall("enqueue", uploadfile.getName(), filedata);
-
-				}
-				catch (IOException e) {
-						Log.d(Tags.LOG,"uploadLocalFile(): IOException: "+e.getMessage());
-				}
-				removeLocalNZBFile(UPLOADFILENAME);
-				UPLOADFILENAME = "";
-				uploadDialogHandler.sendEmptyMessage(0);
-			}
-			
-		}.start();
-	}
-
 	// Wrapper for deleting file from LocalNZB list.
 	public void removeLocalNZBFile(String filename){
 		Log.d(Tags.LOG,"Removing file from database.");
@@ -419,6 +432,7 @@ public class LocalNZB extends Activity {
 			Log.d(Tags.LOG,"removeFromDatabase(): Deleting file metadata in DB (meta).");
 			LocalNZBMetadata.myDatabase.delete("meta", "file_id='"+cur.getString(idIndex)+"'", null);		
 		}
+		LocalNZBMetadata.close();
 	}
 	
 	

@@ -1,35 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 <string-array name="searchCategory"><item>All Categories</item>
-<item>Movies</item>
-<item>Movies-DVD</item>
-<item>Movies-WMV-HD</item>
-<item>Movies-x264</item>
-<item>Movies-XviD</item>
-<item>TV</item>
-<item>TV-DVD</item>
-<item>TV-FGN</item>
-<item>TV-H264</item>
-<item>TV-x264</item>
-<item>TV-XviD</item>
-<item>XXX</item>
-<item>XXX-DVD</item>
-<item>XXX-Pack</item>
-<item>XXX-WMV</item>
-<item>XXX-x264</item>
-<item>XXX-XviD</item>
-<item>PC</item>
-<item>PC-0day</item>
-<item>PC-ISO</item>
-<item>PC-Mac</item>
-<item>Music</item>
-<item>Music-MP3</item>
-<item>Music-Video</item>
-<item>Console</item>
-<item>Console-NDS</item>
-<item>Console-PSP</item>
-<item>Console-Wii</item>
-<item>Console-XBox</item>
-<item>Console-XBox360</item>
+	<item>Movies</item>
+	<item>Movies-DVD</item>
+	<item>Movies-WMV-HD</item>
+	<item>Movies-x264</item>
+	<item>Movies-XviD</item>
+	<item>TV</item>
+	<item>TV-DVD</item>
+	<item>TV-FGN</item>
+	<item>TV-H264</item>
+	<item>TV-x264</item>
+	<item>TV-XviD</item>
+	<item>XXX</item>
+	<item>XXX-DVD</item>
+	<item>XXX-Pack</item>
+	<item>XXX-WMV</item>
+	<item>XXX-x264</item>
+	<item>XXX-XviD</item>
+	<item>PC</item>
+	<item>PC-0day</item>
+	<item>PC-ISO</item>
+	<item>PC-Mac</item>
+	<item>Music</item>
+	<item>Music-MP3</item>
+	<item>Music-Video</item>
+	<item>Console</item>
+	<item>Console-NDS</item>
+	<item>Console-PSP</item>
+	<item>Console-Wii</item>
+	<item>Console-XBox</item>
+	<item>Console-XBox360</item>
+</string-array>
+<string-array name="preferredUploadMethod">
+	<item>HellaNZB</item>
+	<item>FTP</item>
 </string-array>
 </resources>

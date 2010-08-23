@@ -12,7 +12,7 @@
 	<string name="preferencesNzbsPassword">Password of nzbs.org account</string>
 	<string name="preferencesNzbsPasswordDefault"></string>
 	
-	<string name="preferencesPreferredUploadMethod">hellanzb or ftp?</string>
+	<string name="preferencesPreferredUploadMethod">Preferred Upload Method for local files.</string>
 	<string name="preferencesPreferredUploadMethodDefault">hellanzb</string>
 	
 	
