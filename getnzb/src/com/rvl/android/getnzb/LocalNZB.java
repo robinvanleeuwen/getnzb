@@ -210,8 +210,10 @@ public class LocalNZB extends Activity {
 					}
 				} catch (SocketException e) {
 					Log.d(Tags.LOG,"ftp(): "+e.getMessage());
+					return;
 				} catch (IOException e) {
 					Log.d(Tags.LOG,"ftp(): "+e.getMessage());
+					return;
 				}
 				removeLocalNZBFile(UPLOADFILENAME);
 				
@@ -261,11 +263,13 @@ public class LocalNZB extends Activity {
 	}
 		
     public void listLocalFiles(){
-    	
+    ;
     	Log.d(Tags.LOG, "- localnzb.listLocalFiles()");
     	setContentView(R.layout.localnzb);
+    	SharedPreferences prefs = GetNZB.preferences;
+		String preferredMethod = prefs.getString("preferredUploadMethod", "");
     	TextView statusbar = (TextView) findViewById(R.id.hellaStatus);
-    	statusbar.setText("Local files. Click to upload to HellaNZB, long click for options:");
+    	statusbar.setText("Local files. Click to upload to "+preferredMethod+", long click for options:");
       	Log.d(Tags.LOG,"Opening database.");
     	LocalNZBMetadata.openDatabase();
     	Cursor cur;
