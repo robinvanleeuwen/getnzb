@@ -5,5 +5,7 @@
 		android:id="@+id/deleteLocalFile" android:title="@string/localFileList_deleteFile"/>
 		<item 
 		android:id="@+id/uploadLocalFileFTP" android:title="@string/localFileList_uploadFTP"/>
+		<item 
+		android:id="@+id/uploadLocalFileHellaNZB" android:title="@string/localFileList_uploadHellaNZB"/>
 		
 </menu>

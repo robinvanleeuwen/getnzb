@@ -12,6 +12,11 @@
 	<string name="preferencesNzbsPassword">Password of nzbs.org account</string>
 	<string name="preferencesNzbsPasswordDefault"></string>
 	
+	<string name="preferencesPreferredUploadMethod">hellanzb or ftp?</string>
+	<string name="preferencesPreferredUploadMethodDefault">hellanzb</string>
+	
+	
+	
 	<string name="preferencesHellaNZBHostname">Hostname of HellaNZB server</string>
 	<string name="preferencesHellaNZBHostnameDefault"></string>
 	<string name="preferencesHellaNZBPort">HellaNZB server port</string>
@@ -34,5 +39,6 @@
 	<string name="localFileList_deleteFile">Delete File</string>
 	<string name="localFileList_infoFile">File Information</string>
 	<string name="localFileList_uploadFTP">Upload to FTP server</string>
+	<string name="localFileList_uploadHellaNZB">Upload to HellaNZB server</string>
 
 </resources>
