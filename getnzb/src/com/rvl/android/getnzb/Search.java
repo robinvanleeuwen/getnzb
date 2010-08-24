@@ -345,7 +345,7 @@ public class Search extends Activity {
     private class downloadfile extends AsyncTask<String, Void, Void>{
     	//private static final Object[] String a = null;
 		ProgressDialog sdc_dialog = new ProgressDialog(Search.this);
-    
+		
     	protected void onPreExecute(){
     		this.sdc_dialog.setMessage("Downloading .nzb file...");
     		this.sdc_dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -372,7 +372,7 @@ public class Search extends Activity {
     			  String age  = HITLIST[position][1];
     			  String size = HITLIST[position][2];
     			  String category = HITLIST[position][4];
-    			
+    			 
     			  Log.d(Tags.LOG,"Inserting filename and metadata in database.");
     			  
     			  LocalNZBMetadata.openDatabase();

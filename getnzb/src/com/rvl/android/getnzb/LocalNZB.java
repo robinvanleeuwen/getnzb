@@ -71,8 +71,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class LocalNZB extends Activity {
 
-	public static URI uri;
-	public static XMLRPCClient client;	
+	public static HellaNZB HELLACONNECTION = new HellaNZB();
 	public static HashMap<String,Object> hellareturn = null;
 	public static final int MENU_PREFS = 0;
 	public static final int MENU_QUIT = 1;
@@ -140,7 +139,7 @@ public class LocalNZB extends Activity {
 				try{
 					filedata = readFile(uploadfile);
 					@SuppressWarnings("unused")
-					HashMap<String, Object> response = (HashMap<String, Object>) hellaNZBCall("enqueue", uploadfile.getName(), filedata);
+					HashMap<String, Object> response = (HashMap<String, Object>) HELLACONNECTION.call("enqueue", uploadfile.getName(), filedata);
 
 				}
 				catch (IOException e) {
@@ -230,40 +229,10 @@ public class LocalNZB extends Activity {
 		Toast.makeText(this, "File Deleted", Toast.LENGTH_SHORT).show();
 		listLocalFiles();
 	}
-	
-	public static int hellaConnect(){
- 		Log.d(Tags.LOG,"- localnzb.hellaConnect()");
-		Log.d(Tags.LOG,"hellaConnect(): Getting preferences");
-		SharedPreferences prefs = GetNZB.preferences;
-		String hellaHost = prefs.getString("hellanzb_hostname", "");
-			
-		if(!hellaHost.matches("(https?)://.+")) 
-			hellaHost = "http://" + hellaHost;
-		try {
-			Log.d(Tags.LOG,"hellaConnecty(): Creating URI: "+hellaHost + ":" + prefs.getString("hellanzb_port", "8760"));
-			uri = URI.create(hellaHost + ":" + prefs.getString("hellanzb_port", "8760"));
-			Log.d(Tags.LOG,"hellaConnect(): Creating Client");
-			client = new XMLRPCClient(uri.toURL());
-			client.setBasicAuthentication("hellanzb", prefs.getString("hellanzbpassword",""));			
-			Log.d(Tags.LOG,"hellaConnecty(): Calling 'aolsay'");
-			if(client.call("aolsay") != ""){
-							
-				GetNZB.HELLACONNECTED = true;
-				return CONNECT_OK;
-			}
-			
-		} catch (MalformedURLException e) {
-			Log.d(Tags.LOG,"hellaConnect() failed: MalformedURLException:"+e.getMessage());
-			return CONNECT_FAILED_OTHER;
-		} catch (XMLRPCException e) {
-			Log.d(Tags.LOG,"hellaConnect() failed: XMLRPCException:"+e.getMessage());
-			return CONNECT_FAILED_OTHER;
-		}
-		return CONNECT_FAILED_OTHER;
-	}
+
 		
     public void listLocalFiles(){
-    ;
+    
     	Log.d(Tags.LOG, "- localnzb.listLocalFiles()");
     	setContentView(R.layout.localnzb);
     	SharedPreferences prefs = GetNZB.preferences;
@@ -351,60 +320,7 @@ public class LocalNZB extends Activity {
 		localFilesArrayAdapter.notifyDataSetChanged();
 		LocalNZBMetadata.close();
     }
-    
-	public Object hellaNZBCall(String command) {
- 		Log.d(Tags.LOG,"- localnzb.hellaNZBCall(c)");
-		try {
-			if(GetNZB.HELLACONNECTED) return client.call(command);
-			else{
-				Log.d(Tags.LOG,"hellaNZBCall(): Not hellaConnected, hellaConnecting first.");
-				hellaConnect();
-				return client.call(command);
-			}
-		} catch(XMLRPCException e) {
-			Log.e(Tags.LOG, "hellaNZBCall(): "+e.getMessage());
-			GetNZB.HELLACONNECTED = false;
-		}
-		return null;
-	}
-	
-
-	public Object hellaNZBCall(String command, String extra1) {
- 		Log.d(Tags.LOG,"- localnzb.hellaNZBCall(c,e)"); 	
-		try {
-			if(GetNZB.HELLACONNECTED) return client.call(command, extra1);
-			else{
-				Log.d(Tags.LOG,"hellaNZBCall(): Not connected, connecting first.");
-				hellaConnect();
-				return client.call(command, extra1);
-			}
-		} catch(XMLRPCException e) {
-			Log.e(Tags.LOG, "hellaNZBCall(): "+e.getMessage());
-			GetNZB.HELLACONNECTED = false;
-		}
-		return null;
-	}
-	
-	
-	public static Object hellaNZBCall(String command, String extra1, String extra2) {
- 		Log.d(Tags.LOG,"- localnzb.hellaNZBCall(c,e,e)");
-		try {
-			if(GetNZB.HELLACONNECTED) {
-				return client.call(command, extra1, extra2);
-				
-			} else{
-				Log.d(Tags.LOG,"hellaNZBCall(): Not connected, connecting first.");
-				hellaConnect();
-				return client.call(command, extra1, extra2);
-			}
-		} catch(XMLRPCException e) {
-			Log.e(Tags.LOG, "hellaNZBCall(): "+e.getMessage());
-			GetNZB.HELLACONNECTED = false;
-		}
-		return null;
-	}
-	
-	
+ 	
 	final  Handler uploadDialogHandler = new Handler(){
 		public void handleMessage(Message msg){
 			// After uploading refresh the LocalNZB filelist.		

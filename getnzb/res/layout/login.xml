@@ -35,20 +35,16 @@
 	android:typeface="sans"
 	android:id="@+id/button_login" 
 	android:onClick="button_handler" 
-	android:layout_width="170dip" 
 	android:text="Search nzbs.org" 
-	android:layout_y="210dip" 
 	android:layout_centerHorizontal="true" 
-	android:layout_below="@+id/apptitle" android:layout_x="100dip">
+	android:layout_below="@+id/apptitle" android:layout_width="185dip">
 </Button><ImageView android:layout_height="wrap_content" android:layout_below="@+id/button_login" android:layout_width="wrap_content" android:layout_centerHorizontal="true" android:id="@+id/spacer01" android:paddingBottom="15dip"></ImageView><Button android:textStyle="bold" 
 	android:typeface="sans" 
-	android:id="@+id/button_hellanzb" 
 	android:onClick="button_handler" 
-	android:layout_width="170dip" 
-	android:layout_x="79dip" 
 	android:text="Manage .nzb files" 
 	android:layout_centerHorizontal="true" 
-	android:layout_y="290dip" 
-	android:layout_height="50dip" android:layout_below="@+id/spacer01">
+	android:layout_height="50dip" android:layout_below="@+id/spacer01" android:layout_width="185dip" android:id="@+id/button_localnzb">
 </Button>
+<ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/spacer02" android:layout_below="@id/button_localnzb" android:paddingBottom="15dip"></ImageView><Button android:layout_centerHorizontal="true" android:id="@+id/button_monitor" android:onClick="button_handler" android:text="Monitor Newsgrabber" android:textStyle="bold" android:layout_height="50dip" android:layout_width="185dip" android:layout_below="@+id/spacer02"></Button>
+
 </RelativeLayout>

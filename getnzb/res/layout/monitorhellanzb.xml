@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content" android:background="@drawable/background">
+<RelativeLayout android:id="@+id/currentHeaderLayout" android:layout_width="fill_parent" android:layout_height="wrap_content" android:background="#162538"><TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:textColor="#8EA7C8" android:paddingTop="1dip" android:paddingBottom="1dip" android:textStyle="bold" android:text="Currently downloading:" android:paddingLeft="2dip" android:id="@+id/text_hdrCurDown"></TextView>
+</RelativeLayout><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/currentHeaderLayout" android:id="@+id/currentFilename" android:text="No current download..." android:textColor="#D6CBF2"></TextView><ProgressBar android:layout_centerHorizontal="true" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/currentFilename" android:id="@+id/currentProgress"></ProgressBar><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/eta" android:textColor="#D6CBF2" android:layout_below="@id/currentProgress" android:text="--:--"></TextView><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:id="@+id/sizeRemaining" android:textColor="#D6CBF2" android:layout_below="@id/currentProgress" android:text="--- MB/--- MB"></TextView><RelativeLayout android:layout_height="wrap_content" android:background="#162538" android:id="@+id/queueHeaderLayout" android:layout_width="fill_parent" android:layout_below="@+id/eta"><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/textQueue" android:textColor="#8EA7C8" android:textStyle="bold" android:paddingLeft="2dip" android:text="Queue:"></TextView>
+</RelativeLayout>
+
+
+
+
+
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/currentProgress" android:layout_alignParentRight="true" android:textColor="#D6CBF2" android:id="@+id/speed" android:text="----KB/s"></TextView>
+</RelativeLayout>

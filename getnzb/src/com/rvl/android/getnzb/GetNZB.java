@@ -53,7 +53,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class GetNZB extends Activity {
 	
@@ -85,6 +87,7 @@ public class GetNZB extends Activity {
         setContentView(R.layout.login);
         preferences = getSharedPreferences(Tags.PREFS,0);
         builder = new AlertDialog.Builder(this);
+       
 
     }
     
@@ -166,11 +169,14 @@ public class GetNZB extends Activity {
     			login();
     		}
     		break;
-    	case R.id.button_hellanzb:
+    	case R.id.button_localnzb:
     		//if(preferences.getString("hellanzb_hostname", "")=="")
     		//	showDialog(DIALOG_NO_HELLANZB_SETTINGS);
     		//else 
     			startLocalNZB();
+    		break;
+    	case R.id.button_monitor:
+    			startMonitor();
     		break;
     	}
     }
@@ -242,9 +248,28 @@ public class GetNZB extends Activity {
     public  void startPreferences(){
         startActivity(new Intent(this,Preferences.class));
     }
+    
+    public void startMonitor(){
+    	String preferredNewsgrabber = preferences.getString("preferredNewsgrabber", "None");
+    	if(preferredNewsgrabber.equals("None")){
+    		Toast.makeText(this, "Select preferred newsgrabber in preferences.", Toast.LENGTH_LONG).show();
+    		return;
+    	}
+    	if(preferredNewsgrabber.equals("HellaNZB")){
+    		if(preferences.getString("hellanzb_hostname", "").equals("")){
+    			Toast.makeText(this, "Enter HellaNZB settings in preferences.", Toast.LENGTH_LONG).show();
+    			return;
+    		}
+    		else{
+    			startActivity(new Intent(this,MonitorHellaNZB.class));	
+    			return;
+    		}
+    	}
+    }
 
     public void quit(){
     	Log.d(Tags.LOG,"- quit(): Ending application.");
+    	
     	this.finish();
     }
 
