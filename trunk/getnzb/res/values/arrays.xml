@@ -36,4 +36,8 @@
 	<item>HellaNZB</item>
 	<item>FTP</item>
 </string-array>
+<string-array name="preferredNewsgrabber">
+	<item>None</item>
+	<item>HellaNZB</item>
+</string-array>
 </resources>

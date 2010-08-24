@@ -8,6 +8,7 @@ import android.app.ProgressDialog;
 import android.util.Log;
 
 public class NZBHandler{
+	HellaNZB HELLACONNECTION = new HellaNZB();
 	ProgressDialog uploaddialog;
 	Activity context;
 	
@@ -27,7 +28,7 @@ public class NZBHandler{
 				try {
 					filedata = LocalNZB.readFile(nzbfile);
 					@SuppressWarnings("unused")
-					HashMap<String, Object> response = (HashMap<String, Object>) LocalNZB.hellaNZBCall("enqueue", nzbfile.getName(), filedata);
+					HashMap<String, Object> response = (HashMap<String, Object>) HELLACONNECTION.call("enqueue", nzbfile.getName(), filedata);
 
 				} catch (IOException e) {
 					Log.d(Tags.LOG,"uploadLocalFile(): IOException: "+e.getMessage());

@@ -26,7 +26,16 @@
 			android:defaultValue="HellaNZB"
 			/>
   </PreferenceCategory>
-  
+  <PreferenceCategory android:title="Newsgrabber preferences" >
+		<ListPreference
+			android:key="preferredNewsgrabber"
+			android:title="Newsgrabber"
+			android:summary="@string/preferencesPreferredNewsgrabber"
+			android:entries="@array/preferredNewsgrabber"
+			android:entryValues="@array/preferredNewsgrabber"
+			android:defaultValue="None"
+			/>  
+  </PreferenceCategory>  
   <PreferenceCategory android:title="HellaNZB preferences" >
   		<EditTextPreference 
 			android:key="hellanzb_hostname" 
