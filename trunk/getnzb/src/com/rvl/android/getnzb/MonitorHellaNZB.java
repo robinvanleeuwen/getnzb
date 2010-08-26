@@ -2,6 +2,7 @@ package com.rvl.android.getnzb;
 
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -10,11 +11,16 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class MonitorHellaNZB extends Activity{
 	public static HellaNZB HELLACONNECTION = new HellaNZB();
+	public static int REFRESH_INTERVAL = 3000; // Refresh interval in ms.
+	public boolean PAUSED = false;
+	
 	private final Handler handler = new Handler();
 	private Timer t;
 	
@@ -25,17 +31,21 @@ public class MonitorHellaNZB extends Activity{
 		autoQueueRefresh();
 	}
 	
+	
+	
 	public void updateCurrentDownloadScreen(String status){
 		String values[] = status.split("#");
 
 		int remaining = Integer.parseInt(values[2]) - Integer.parseInt(values[3]);
-
+		
 		((TextView) findViewById(R.id.currentFilename)).setText(values[1]);
 		((TextView) findViewById(R.id.eta)).setText(values[5]);
 		((TextView) findViewById(R.id.sizeRemaining)).setText(Integer.toString(remaining)+" MB / "+values[2]+" MB");
 		((TextView) findViewById(R.id.speed)).setText(values[4]+" KB/s");
 		((ProgressBar) findViewById(R.id.currentProgress)).setProgress(Integer.parseInt(values[6]));
-		
+		if(values[0].equals("true")){
+			((TextView) findViewById(R.id.eta)).setText("Paused");
+		}
 		
 	}
 	
@@ -50,11 +60,14 @@ public class MonitorHellaNZB extends Activity{
 	//        6 <Percent complete of current download>
 	
 	@SuppressWarnings("unchecked")
-	public String getHellaNZBStatus(){
+	public String getHellaNZBCurrentStatus(){
 		String status = "";
 		Log.d(Tags.LOG,"- getHellaNZBStatus(): retrieving status.");
 		HashMap<String,Object> globalinfo = (HashMap<String, Object>) HELLACONNECTION.call("status");
 		Object[] tt = (Object[]) globalinfo.get("currently_downloading");
+		if(tt.length == 0){
+			return(globalinfo.get("is_paused").toString()+"#Currently not downloading.#0#0#--#--:--#0");
+		}
 		HashMap<String,Object> currdlinfo = (HashMap<String, Object>) tt[0];
 		
 		status += globalinfo.get("is_paused").toString() + "#";
@@ -68,6 +81,29 @@ public class MonitorHellaNZB extends Activity{
 		Log.d(Tags.LOG,"getHellaNZBStatus(): "+status);
 			
 		return status;
+	}
+	
+	public void updateHellaNZBQueueStatus(){
+    	ArrayList<String> items = new ArrayList<String>();
+ 		ArrayAdapter<String> QueueAdapter =  new HellaNZBQueueRowAdapter(this,items);
+ 		ListView hellaqueue = (ListView) findViewById(R.id.hellanzbQueueList);
+		hellaqueue.setCacheColorHint(00000000);
+		hellaqueue.setAdapter(QueueAdapter);
+		String name="";
+		String size="";
+		HashMap<String,Object> globalinfo = (HashMap<String, Object>) HELLACONNECTION.call("status");
+		Object[] tt = (Object[]) globalinfo.get("queued");
+		if(tt.length == 0){
+			// No items in queue
+			return;
+		}
+		for(int c=0;c<tt.length;c++){
+			HashMap<String,Object> queueitem = (HashMap<String, Object>) tt[c];
+			name = queueitem.get("nzbName").toString();
+			size = queueitem.get("total_mb").toString();
+			items.add(name+"#"+size+" MB");                                       
+		}
+		QueueAdapter.notifyDataSetChanged();
 	}
 	
 	private static String convertEta(int secs) {
@@ -88,12 +124,27 @@ public class MonitorHellaNZB extends Activity{
 			public void run() {
 				handler.post(new Runnable() {
 					public void run() {
-						if(HELLACONNECTION.CONNECTED)
-							updateCurrentDownloadScreen(getHellaNZBStatus());
+						if(HELLACONNECTION.CONNECTED && !PAUSED)
+							updateCurrentDownloadScreen(getHellaNZBCurrentStatus());
+							updateHellaNZBQueueStatus();
 					}
 				});
 			}
-		}, 0, 2000);
+		}, 0, REFRESH_INTERVAL);
 	}
+	protected void onDestroy() {
+		super.onDestroy();
+	}
+	protected void onPause(){
+		Log.d(Tags.LOG,"MonitorHellaNZB pausing.");
+		PAUSED = true;
+		super.onPause();
+	}
+	protected void onResume(){
+		Log.d(Tags.LOG,"MonitorHellaNZB resuming.");
+		PAUSED = false;
+		super.onResume();
+	}
+
 
 }
