@@ -33,7 +33,7 @@
 	<string name="preferencesFTPUploadPath">Upload file to directory</string>
 	<string name="preferencesFTPUploadPathDefault">~/</string>
 	
-	
+	<string name="hellanzb_deleteFile">Delete File</string>	
 	
 	<string name="localFileList_deleteFile">Delete File</string>
 	<string name="localFileList_infoFile">File Information</string>

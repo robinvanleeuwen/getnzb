@@ -129,7 +129,9 @@ public class LocalNZB extends Activity {
 			Log.d(Tags.LOG,"No HellaNZB settings Toast");
 			Toast.makeText(this, "Upload to HellaNZB not possible, please check HellaNZB preferences.", Toast.LENGTH_LONG).show();
 			return;
+			
 		}
+		
 		new Thread(){
 			@SuppressWarnings("unchecked")
 			public void run(){
