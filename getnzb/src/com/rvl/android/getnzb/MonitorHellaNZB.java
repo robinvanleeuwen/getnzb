@@ -78,13 +78,14 @@ public class MonitorHellaNZB extends Activity{
 		status += convertEta((Integer) globalinfo.get("eta")) + "#";
 		status += globalinfo.get("percent_complete").toString();
 		
-		Log.d(Tags.LOG,"getHellaNZBStatus(): "+status);
+		
 			
 		return status;
 	}
 	
 	public void updateHellaNZBQueueStatus(){
-    	ArrayList<String> items = new ArrayList<String>();
+		if(PAUSED) return;
+		ArrayList<String> items = new ArrayList<String>();
  		ArrayAdapter<String> QueueAdapter =  new HellaNZBQueueRowAdapter(this,items);
  		ListView hellaqueue = (ListView) findViewById(R.id.hellanzbQueueList);
 		hellaqueue.setCacheColorHint(00000000);
@@ -119,12 +120,14 @@ public class MonitorHellaNZB extends Activity{
 	}	
 	
 	private void autoQueueRefresh() {
+		
 		t = new Timer();
 		t.schedule(new TimerTask() {
 			public void run() {
 				handler.post(new Runnable() {
 					public void run() {
 						if(HELLACONNECTION.CONNECTED && !PAUSED)
+							
 							updateCurrentDownloadScreen(getHellaNZBCurrentStatus());
 							updateHellaNZBQueueStatus();
 					}
@@ -137,12 +140,13 @@ public class MonitorHellaNZB extends Activity{
 	}
 	protected void onPause(){
 		Log.d(Tags.LOG,"MonitorHellaNZB pausing.");
-		PAUSED = true;
+		this.PAUSED = true;
+	
 		super.onPause();
 	}
 	protected void onResume(){
 		Log.d(Tags.LOG,"MonitorHellaNZB resuming.");
-		PAUSED = false;
+		this.PAUSED = false;
 		super.onResume();
 	}
 
