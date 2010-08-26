@@ -83,6 +83,7 @@ public class MonitorHellaNZB extends Activity{
 		return status;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void updateHellaNZBQueueStatus(){
 		if(PAUSED) return;
 		ArrayList<String> items = new ArrayList<String>();
