@@ -98,7 +98,7 @@ public class HellaNZB{
 				return this.client.call(command);
 			}
 		} catch(XMLRPCException e) {
-			Log.e(Tags.LOG, "HellaNZB.call(): "+e.getMessage());
+			//Log.e(Tags.LOG, "HellaNZB.call(): "+e.getMessage());
 			this.CONNECTED = false;
 		}
 		return null;

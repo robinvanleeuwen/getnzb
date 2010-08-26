@@ -11,17 +11,27 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class MonitorHellaNZB extends Activity{
 	public static HellaNZB HELLACONNECTION = new HellaNZB();
-	public static int REFRESH_INTERVAL = 3000; // Refresh interval in ms.
+	public static int REFRESH_INTERVAL = 4000; // Refresh interval in ms.
 	public boolean PAUSED = false;
-	
+	public static final int MENU_PREFS = 1;
+	public static final int MENU_PAUSE = 2;
 	private final Handler handler = new Handler();
+	public ListView hellaqueue;
+	
 	private Timer t;
 	
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +41,74 @@ public class MonitorHellaNZB extends Activity{
 		autoQueueRefresh();
 	}
 	
+	public void onCreateContextMenu(ContextMenu menu, View view,
+            ContextMenuInfo menuInfo) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.hellanzbcontextmenu, menu);
+		super.onCreateContextMenu(menu, view, menuInfo);
+	}
+	
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		
+		
+		String nzbitem = hellaqueue.getAdapter().getItem((int)info.id).toString();
+		String[] values = nzbitem.split("#");
+		
+		Log.d(Tags.LOG,"CONTEXT:"+nzbitem);
+		// Log.d(Tags.LOG,"ITEM SELECTED:"+nzbitem);
+		// String[] temp = nzbItem.split("#");
+		// String nzbId = temp[2];
+		
+		switch(item.getItemId()){
+
+		case R.id.deleteHellaNZBFile:
+            deleteHellaNZBFileContextItem(values[2]);
+            return true;
+		}
+		return false;
+	}
+	
+	public void deleteHellaNZBFileContextItem(String id){
+		HELLACONNECTION.call("dequeue",id);
+		
+	}
+	
+	
+	
+    public boolean onCreateOptionsMenu(Menu menu){
+		menu.add(0, MENU_PREFS, 0, "Preferences");
+		menu.add(0, MENU_PAUSE, 0, "Pause");
+    	return true;
+    }
+    
+    public boolean onOptionsItemSelected(MenuItem item){
+    	switch (item.getItemId()){
+    	case MENU_PREFS:
+    		startHellaNZBPreferences();
+    		return true;
+    	case MENU_PAUSE:
+    		pauseHellaNZB();
+    		return true;
+    	}
+    	return false;
+    }
+    
+    public void startHellaNZBPreferences(){
+    	
+    }
+    
+    @SuppressWarnings("unchecked")
+	public void pauseHellaNZB(){
+		HashMap<String,Object> globalinfo = (HashMap<String, Object>) HELLACONNECTION.call("status");
+		String ispaused = globalinfo.get("is_paused").toString();
+		if(ispaused.equals("true")){
+			HELLACONNECTION.call("continue");
+		}
+		else if(ispaused.equals("false")){
+			HELLACONNECTION.call("pause");
+		}
+    }
 	
 	
 	public void updateCurrentDownloadScreen(String status){
@@ -86,13 +164,15 @@ public class MonitorHellaNZB extends Activity{
 	@SuppressWarnings("unchecked")
 	public void updateHellaNZBQueueStatus(){
 		if(PAUSED) return;
+		hellaqueue = (ListView) findViewById(R.id.hellanzbQueueList);
 		ArrayList<String> items = new ArrayList<String>();
  		ArrayAdapter<String> QueueAdapter =  new HellaNZBQueueRowAdapter(this,items);
- 		ListView hellaqueue = (ListView) findViewById(R.id.hellanzbQueueList);
 		hellaqueue.setCacheColorHint(00000000);
 		hellaqueue.setAdapter(QueueAdapter);
+		registerForContextMenu(hellaqueue);
 		String name="";
 		String size="";
+		String id="";
 		HashMap<String,Object> globalinfo = (HashMap<String, Object>) HELLACONNECTION.call("status");
 		Object[] tt = (Object[]) globalinfo.get("queued");
 		if(tt.length == 0){
@@ -101,9 +181,10 @@ public class MonitorHellaNZB extends Activity{
 		}
 		for(int c=0;c<tt.length;c++){
 			HashMap<String,Object> queueitem = (HashMap<String, Object>) tt[c];
+			id   = queueitem.get("id").toString();
 			name = queueitem.get("nzbName").toString();
 			size = queueitem.get("total_mb").toString();
-			items.add(name+"#"+size+" MB");                                       
+			items.add(name+"#"+size+" MB"+"#"+id);                                       
 		}
 		QueueAdapter.notifyDataSetChanged();
 	}
