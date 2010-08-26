@@ -87,7 +87,7 @@ public class HellaNZB{
 	}
 	
 	public Object call(String command) {
- 		Log.d(Tags.LOG,"- HellaNZB.call(c)");
+ 		Log.d(Tags.LOG,"- HellaNZB.call("+command+")");
 		try {
 			if(this.CONNECTED) {
 				return this.client.call(command);
