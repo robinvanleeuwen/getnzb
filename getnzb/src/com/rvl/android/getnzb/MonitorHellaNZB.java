@@ -8,6 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -25,7 +26,8 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class MonitorHellaNZB extends Activity{
 	public static HellaNZB HELLACONNECTION = new HellaNZB();
-	public static int REFRESH_INTERVAL = 4000; // Refresh interval in ms.
+	
+	public static int REFRESH_INTERVAL = 8000; // Refresh interval in ms.
 	public boolean PAUSED = false;
 	public static final int MENU_PREFS = 1;
 	public static final int MENU_PAUSE = 2;
@@ -37,7 +39,9 @@ public class MonitorHellaNZB extends Activity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.monitorhellanzb);
-		if(HELLACONNECTION.CONNECTED == false) HELLACONNECTION.connect();
+		SharedPreferences prefs = GetNZB.preferences;
+		REFRESH_INTERVAL = Integer.parseInt(prefs.getString("updateNewsgrabberInterval", "8000"));
+		if(HELLACONNECTION.CONNECTED == false) HELLACONNECTION.connect();	
 		autoQueueRefresh();
 	}
 	
@@ -77,7 +81,7 @@ public class MonitorHellaNZB extends Activity{
 	
 	
     public boolean onCreateOptionsMenu(Menu menu){
-		menu.add(0, MENU_PREFS, 0, "Preferences");
+		//menu.add(0, MENU_PREFS, 0, "Preferences");
 		menu.add(0, MENU_PAUSE, 0, "Pause");
     	return true;
     }
@@ -181,14 +185,19 @@ public class MonitorHellaNZB extends Activity{
 		}
 		for(int c=0;c<tt.length;c++){
 			HashMap<String,Object> queueitem = (HashMap<String, Object>) tt[c];
+			 
 			id   = queueitem.get("id").toString();
 			name = queueitem.get("nzbName").toString();
-			size = queueitem.get("total_mb").toString();
+			// Sometimes size isn't available (yet)...
+			if(queueitem.containsKey("total_mb")) size = queueitem.get("total_mb").toString();			
+			else size = "--";
+			
 			items.add(name+"#"+size+" MB"+"#"+id);                                       
+			
 		}
 		QueueAdapter.notifyDataSetChanged();
 	}
-	
+
 	private static String convertEta(int secs) {
 		int hours = secs / 3600,
 		remainder = secs % 3600,
@@ -201,6 +210,13 @@ public class MonitorHellaNZB extends Activity{
 		return(disHour +":"+ disMinu+":"+disSec);
 	}	
 	
+	public void manualQueueRefresh(){
+		if(HELLACONNECTION.CONNECTED && !PAUSED){		
+			updateCurrentDownloadScreen(getHellaNZBCurrentStatus());
+			updateHellaNZBQueueStatus();
+		}
+	}
+	
 	private void autoQueueRefresh() {
 		
 		t = new Timer();
@@ -208,10 +224,10 @@ public class MonitorHellaNZB extends Activity{
 			public void run() {
 				handler.post(new Runnable() {
 					public void run() {
-						if(HELLACONNECTION.CONNECTED && !PAUSED)
-							
+						if(HELLACONNECTION.CONNECTED && !PAUSED){						
 							updateCurrentDownloadScreen(getHellaNZBCurrentStatus());
 							updateHellaNZBQueueStatus();
+						}
 					}
 				});
 			}

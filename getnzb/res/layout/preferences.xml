@@ -34,7 +34,15 @@
 			android:entries="@array/preferredNewsgrabber"
 			android:entryValues="@array/preferredNewsgrabber"
 			android:defaultValue="None"
-			/>  
+			/>
+		<ListPreference
+			android:key="updateNewsgrabberInterval"
+			android:title="Update Interval"
+			android:summary="@string/preferencesUpdateNewsgrabberInterval"
+			android:entries="@array/updateNewsgrabberInterval"
+			android:entryValues="@array/updateNewsgrabberInterval"
+			android:defaultValue="8000" />
+			
   </PreferenceCategory>  
   <PreferenceCategory android:title="HellaNZB preferences" >
   		<EditTextPreference 

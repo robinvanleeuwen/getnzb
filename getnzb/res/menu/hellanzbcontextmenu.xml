@@ -3,5 +3,13 @@
   xmlns:android="http://schemas.android.com/apk/res/android">
     	<item 
 		android:id="@+id/deleteHellaNZBFile" android:title="@string/hellanzb_deleteFile"/>
-
+		<item
+		android:id="@+id/moveTopHellaNZBFile" android:title="@string/hellanzb_moveTop" />
+		<item
+		android:id="@+id/moveUpHellaNZBFile" android:title="@string/hellanzb_moveUp" />
+		<item
+		android:id="@+id/moveDownHellaNZBFile" android:title="@string/hellanzb_moveDown" />
+		<item
+		android:id="@+id/moveBottonHellaNZBFile" android:title="@string/hellanzb_moveBottom" />
+		
 </menu>
