@@ -94,7 +94,7 @@ public class MonitorHellaNZB extends Activity{
     public boolean onCreateOptionsMenu(Menu menu){
 		//menu.add(0, MENU_PREFS, 0, "Preferences");
     	menu.add(0, MENU_REFRESH, 0, "Refresh");
-    	menu.add(0, MENU_STOPCURRENT, 0, "Cancel Current");
+    	menu.add(0, MENU_STOPCURRENT, 0, " Cancel Current ");
 		menu.add(0, MENU_PAUSE, 0, "Pause");
     	return true;
     }
