@@ -1,7 +1,5 @@
 package com.rvl.android.getnzb;
 
-
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
@@ -55,27 +53,27 @@ public class MonitorHellaNZB extends Activity{
 	public boolean onContextItemSelected(MenuItem item) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 		
-		
 		String nzbitem = hellaqueue.getAdapter().getItem((int)info.id).toString();
 		String[] values = nzbitem.split("#");
 		
-		Log.d(Tags.LOG,"CONTEXT:"+nzbitem);
-		// Log.d(Tags.LOG,"ITEM SELECTED:"+nzbitem);
-		// String[] temp = nzbItem.split("#");
-		// String nzbId = temp[2];
-		
 		switch(item.getItemId()){
-
+		case R.id.moveDownHellaNZBFile:
+			HELLACONNECTION.call("down",values[2]);					
+			return true;
+		case R.id.moveUpHellaNZBFile:
+			HELLACONNECTION.call("up",values[2]);						
+			return true;
+		case R.id.moveTopHellaNZBFile:
+			HELLACONNECTION.call("force",values[2]);			
+			return true;
+		case R.id.moveBottonHellaNZBFile:
+			HELLACONNECTION.call("last",values[2]);
+			return true;
 		case R.id.deleteHellaNZBFile:
-            deleteHellaNZBFileContextItem(values[2]);
+			HELLACONNECTION.call("dequeue",values[2]);
             return true;
 		}
 		return false;
-	}
-	
-	public void deleteHellaNZBFileContextItem(String id){
-		HELLACONNECTION.call("dequeue",id);
-		
 	}
 	
 	
@@ -198,7 +196,7 @@ public class MonitorHellaNZB extends Activity{
 		QueueAdapter.notifyDataSetChanged();
 	}
 
-	private static String convertEta(int secs) {
+	public static String convertEta(int secs) {
 		int hours = secs / 3600,
 		remainder = secs % 3600,
 		minutes = remainder / 60,
@@ -217,7 +215,7 @@ public class MonitorHellaNZB extends Activity{
 		}
 	}
 	
-	private void autoQueueRefresh() {
+	public void autoQueueRefresh() {
 		
 		t = new Timer();
 		t.schedule(new TimerTask() {
