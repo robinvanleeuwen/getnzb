@@ -14,7 +14,8 @@
 	
 	<string name="preferencesPreferredUploadMethod">Preferred Upload Method for local files.</string>
 	
-	<string name="preferencesPreferredNewsgrabber">Which newsgrabber do you want to monitor?</string>	
+	<string name="preferencesPreferredNewsgrabber">Which newsgrabber do you want to monitor?</string>
+	<string name="preferencesUpdateNewsgrabberInterval">Newsgrabber update interval in milliseconds.</string>	
 	
 	<string name="preferencesHellaNZBHostname">Hostname of HellaNZB server</string>
 	<string name="preferencesHellaNZBHostnameDefault"></string>
@@ -34,6 +35,10 @@
 	<string name="preferencesFTPUploadPathDefault">~/</string>
 	
 	<string name="hellanzb_deleteFile">Delete File</string>	
+	<string name="hellanzb_moveTop">Move to top</string>
+	<string name="hellanzb_moveBottom">Move to bottom</string>
+	<string name="hellanzb_moveUp">Move up</string>
+	<string name="hellanzb_moveDown">Move down</string>
 	
 	<string name="localFileList_deleteFile">Delete File</string>
 	<string name="localFileList_infoFile">File Information</string>
