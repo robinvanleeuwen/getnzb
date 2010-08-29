@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class MonitorHellaNZB extends Activity{
@@ -29,6 +30,8 @@ public class MonitorHellaNZB extends Activity{
 	public boolean PAUSED = false;
 	public static final int MENU_PREFS = 1;
 	public static final int MENU_PAUSE = 2;
+	public static final int MENU_STOPCURRENT = 3;
+	public static final int MENU_REFRESH = 4;
 	private final Handler handler = new Handler();
 	public ListView hellaqueue;
 	
@@ -58,20 +61,30 @@ public class MonitorHellaNZB extends Activity{
 		
 		switch(item.getItemId()){
 		case R.id.moveDownHellaNZBFile:
-			HELLACONNECTION.call("down",values[2]);					
+			HELLACONNECTION.call("down",values[2]);
+			manualQueueRefresh();
+			Toast.makeText(this, "Moved item down...", Toast.LENGTH_SHORT).show();
 			return true;
 		case R.id.moveUpHellaNZBFile:
-			HELLACONNECTION.call("up",values[2]);						
+			HELLACONNECTION.call("up",values[2]);
+			manualQueueRefresh();
+			Toast.makeText(this, "Moved item up...", Toast.LENGTH_SHORT).show();
 			return true;
 		case R.id.moveTopHellaNZBFile:
-			HELLACONNECTION.call("force",values[2]);			
+			HELLACONNECTION.call("force",values[2]);
+			manualQueueRefresh();
+			Toast.makeText(this, "Moved item to top...", Toast.LENGTH_SHORT).show();
 			return true;
 		case R.id.moveBottonHellaNZBFile:
 			HELLACONNECTION.call("last",values[2]);
+			manualQueueRefresh();
+			Toast.makeText(this, "Moved item to bottom...", Toast.LENGTH_SHORT).show();
 			return true;
 		case R.id.deleteHellaNZBFile:
 			HELLACONNECTION.call("dequeue",values[2]);
-            return true;
+			manualQueueRefresh();
+			Toast.makeText(this, "Item removed...", Toast.LENGTH_SHORT).show();
+			return true;
 		}
 		return false;
 	}
@@ -80,25 +93,28 @@ public class MonitorHellaNZB extends Activity{
 	
     public boolean onCreateOptionsMenu(Menu menu){
 		//menu.add(0, MENU_PREFS, 0, "Preferences");
+    	menu.add(0, MENU_REFRESH, 0, "Refresh");
+    	menu.add(0, MENU_STOPCURRENT, 0, "Cancel Current");
 		menu.add(0, MENU_PAUSE, 0, "Pause");
     	return true;
     }
     
     public boolean onOptionsItemSelected(MenuItem item){
     	switch (item.getItemId()){
-    	case MENU_PREFS:
-    		startHellaNZBPreferences();
+    	case MENU_REFRESH:
+    		manualQueueRefresh();
+			Toast.makeText(this, "Refreshed queue...", Toast.LENGTH_SHORT).show();
     		return true;
     	case MENU_PAUSE:
     		pauseHellaNZB();
     		return true;
+    	case MENU_STOPCURRENT:
+    		stopCurrentDownload();
+    		return true;
     	}
     	return false;
     }
-    
-    public void startHellaNZBPreferences(){
-    	
-    }
+  
     
     @SuppressWarnings("unchecked")
 	public void pauseHellaNZB(){
@@ -106,12 +122,30 @@ public class MonitorHellaNZB extends Activity{
 		String ispaused = globalinfo.get("is_paused").toString();
 		if(ispaused.equals("true")){
 			HELLACONNECTION.call("continue");
+			Toast.makeText(this, "HellaNZB continued...", Toast.LENGTH_SHORT).show();
+
 		}
 		else if(ispaused.equals("false")){
 			HELLACONNECTION.call("pause");
+			Toast.makeText(this, "HellaNZB paused...", Toast.LENGTH_SHORT).show();
+			manualQueueRefresh();
 		}
     }
-	
+	public void stopCurrentDownload(){
+		HashMap<String,Object> globalinfo = (HashMap<String, Object>) HELLACONNECTION.call("status");
+		Object[] tt = (Object[]) globalinfo.get("currently_downloading");
+		if(tt.length == 0){
+			Toast.makeText(this, "Currently not downloading...", Toast.LENGTH_LONG).show();
+			return;
+		}
+		else{
+			HashMap<String,Object> currdlinfo = (HashMap<String, Object>) tt[0];
+			String id = currdlinfo.get("id").toString();
+			HELLACONNECTION.call("cancel");
+			Toast.makeText(this, "Current download canceled...", Toast.LENGTH_SHORT).show();
+			manualQueueRefresh();
+		}
+	}
 	
 	public void updateCurrentDownloadScreen(String status){
 		String values[] = status.split("#");
