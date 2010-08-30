@@ -21,6 +21,7 @@ public class NZBHandler{
 		uploaddialog = ProgressDialog.show(context,"Please wait...","Uploading '"+filename+"' to HellaNZB server.");
 		Log.d(Tags.LOG,"nzbhandler.upload():"+file);
 		new Thread(){
+			@SuppressWarnings("unchecked")
 			public void run(){
 				
 				File nzbfile = new File(file);
