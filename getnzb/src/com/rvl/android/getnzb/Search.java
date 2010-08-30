@@ -76,17 +76,23 @@ public class Search extends Activity {
 	private boolean LOGGEDIN = GetNZB.LOGGEDIN;
 	public static String HITLIST[][];
 	public boolean ENABLE_NEXTBUTTON = true;
-	public String SEARCHTERM = "";
-	public String SEARCHCATEGORY = "0";
+	public static String SEARCHTERM;
+	public static String SEARCHCATEGORY;
 	public int CURRENT_PAGE = 1; 	// Start searching on page 1
 	public static final int MENU_GETCART = 0;
     public NZBDatabase LocalNZBMetadata = new NZBDatabase(this);
     public static HashMap<String,String> SEARCHCATEGORYHASHMAP = new HashMap<String,String>();
+
     
 	protected void onCreate(Bundle savedInstanceState) {
 		Log.d(Tags.LOG, "- Starting search activity -");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.search);
+		if(!SEARCHTERM.equals("")){
+			new searchNZB().execute(SEARCHTERM, SEARCHCATEGORY);
+			return;
+		}
+		
 		TextView statusbar = (TextView) findViewById(R.id.statusbar);
 		statusbar.setText("Enter searchterm.");
 		createSearchCategoryMapping();
@@ -145,6 +151,7 @@ public class Search extends Activity {
 	    	case R.id.btn_backtosearch:
 	    		HITLIST = null;
 	    		CURRENT_PAGE = 1;
+	    		SEARCHTERM = "";
 	    		setContentView(R.layout.search);
 	    		TextView statusbar = (TextView) findViewById(R.id.statusbar);
 	    		statusbar.setText("Enter searchterm and select category.");
@@ -155,7 +162,7 @@ public class Search extends Activity {
 	
 	// searchNZB() searches nzbs.org and reads the supplied HTML page with HTMLCleaner
 	// to build a list of nzb-files (links) that can be sent to the HellaNZB server.	
-	private class searchNZB extends AsyncTask<String, Void, Void>{
+	public class searchNZB extends AsyncTask<String, Void, Void>{
 		    
 	    ProgressDialog searchDialog = new ProgressDialog(Search.this);
 	    
@@ -174,12 +181,14 @@ public class Search extends Activity {
 				Log.d(Tags.LOG, "Search: Not logged in...");
 				return null;
 			}
-			String url = "";			
-			url  = "http://www.nzbs.org/index.php?action=search&q=";
-			url += args[0];
-			url += "&catid=" + args[1];
-			url += "&age=&page="+Integer.toString(CURRENT_PAGE);
-			Log.d(Tags.LOG,"Constructed URL:"+url);
+   			String url = "";
+   			
+   			url  = "http://www.nzbs.org/index.php?action=search&q=";
+   			url += args[0];
+   			url += "&catid=" + args[1];
+   			url += "&age=&page="+Integer.toString(CURRENT_PAGE);
+   			
+   			Log.d(Tags.LOG,"Constructed URL:"+url);
 			try {
 				int progresscounter = 5;
 				this.searchDialog.setProgress(progresscounter);
@@ -351,7 +360,7 @@ public class Search extends Activity {
 		super.onDestroy();
 	}
     
-    private class downloadfile extends AsyncTask<String, Void, Void>{
+    public class downloadfile extends AsyncTask<String, Void, Void>{
     	//private static final Object[] String a = null;
 		ProgressDialog sdc_dialog = new ProgressDialog(Search.this);
 		

@@ -24,13 +24,9 @@ public class SearchResultRowAdapter extends ArrayAdapter<String>{
 		View row = inflater.inflate(R.layout.searchresultlist, null);
 		String[] values = items.get(position).split("#");
 		
-		Log.d(Tags.LOG,"Setting age:"+values[1]);
 		((TextView) row.findViewById(R.id.age)).setText(values[1]);		
-		Log.d(Tags.LOG,"Setting size:"+values[2]);
 		((TextView) row.findViewById(R.id.size)).setText(values[2]);
-		Log.d(Tags.LOG,"Setting name:"+values[0]);
 		((TextView) row.findViewById(R.id.name)).setText(values[0]);
-		Log.d(Tags.LOG,"Setting category:"+values[3]);
 		((TextView) row.findViewById(R.id.category)).setText(values[3]);
 
 		return row;
