@@ -6,31 +6,28 @@ android:layout_height="fill_parent"
 xmlns:android="http://schemas.android.com/apk/res/android" 
 android:background="@drawable/background">
 
-<EditText android:layout_width="wrap_content" 
+<RelativeLayout android:layout_above="@+id/statusbar" android:id="@+id/RelativeLayout02" android:layout_height="wrap_content" android:background="#162538" android:layout_width="fill_parent"><TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignBottom="@+id/RelativeLayout01" android:id="@+id/statusbar" android:text="Enter a searchterm and select category." android:textStyle="bold" android:textColor="#D6CBF2"></TextView></RelativeLayout><EditText android:layout_width="wrap_content" 
 android:layout_height="wrap_content" 
 android:id="@+id/searchterm" 
-android:width="250dip"></EditText>
+android:width="250dip" android:layout_marginTop="23dip"></EditText>
 
 <Spinner android:layout_below="@+id/searchterm" 
 android:layout_height="wrap_content" 
 android:layout_width="fill_parent"
 android:entries="@array/searchCategory"
-android:id="@+id/spinnerCategory"></Spinner>
+android:id="@+id/spinnerCategory" android:layout_marginTop="10dip"></Spinner>
  
- <TextView android:layout_height="wrap_content" 
- android:layout_width="wrap_content" 
- android:layout_alignBottom="@+id/RelativeLayout01" 
- android:layout_alignParentBottom="true" 
- android:id="@+id/statusbar" 
- android:text="Enter a searchterm and select category." 
- android:textStyle="bold"></TextView>
+ <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/buttonMynzbs" android:text="MyNZBs" android:textStyle="bold" android:width="160dip" android:layout_marginTop="10dip" android:layout_alignParentBottom="true" android:layout_marginBottom="10dip" android:onClick="btn_handler"></Button><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="My Searches" android:textStyle="bold" android:layout_alignParentRight="true" android:width="160dip" android:id="@+id/buttonMysearches" android:layout_marginTop="10dip" android:layout_alignParentBottom="true" android:layout_marginBottom="10dip" android:onClick="btn_handler"></Button>
  
  <Button android:layout_height="wrap_content" 
  android:layout_width="wrap_content" 
  android:layout_toRightOf="@+id/searchterm" 
  android:width="70dip" android:text="Go..."
  android:typeface="sans" android:id="@+id/btn_search"
- android:textStyle="bold" android:onClick="btn_handler"></Button>
+ android:textStyle="bold" android:onClick="btn_handler" android:layout_marginTop="24dip"></Button>
+
+
+
 
 
 </RelativeLayout>

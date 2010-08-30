@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<AbsoluteLayout
+<RelativeLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="wrap_content"
   android:layout_height="wrap_content"
   android:background="@drawable/background">
   
 
-<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="HellaNZB Status" android:textStyle="bold" android:layout_x="8dip" android:layout_y="5dip" android:textColor="#D6CBF2" android:id="@+id/hellaStatus"></TextView>
-<ListView android:layout_width="310dip" android:layout_x="5dip" android:id="@+id/localFileList" android:layout_y="60dip" android:layout_height="360dip"></ListView>
-</AbsoluteLayout>
+<RelativeLayout android:id="@+id/RelativeLayout01" android:layout_height="wrap_content" android:layout_width="fill_parent" android:background="#162538"><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="HellaNZB Status" android:textStyle="bold" android:layout_x="8dip" android:layout_y="5dip" android:textColor="#D6CBF2" android:id="@+id/hellaStatus"></TextView></RelativeLayout>
+<ListView android:id="@+id/localFileList" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@+id/RelativeLayout01"></ListView>
+
+</RelativeLayout>

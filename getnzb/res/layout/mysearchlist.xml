@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout android:id="@+id/RelativeLayout01" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android"><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#D6CBF2" android:id="@+id/mysearchContent" android:text="mysearchContent"></TextView>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/mysearchContent" android:textColor="#D6CBF2" android:text="mysearchExclude" android:id="@+id/mysearchExclude"></TextView><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#D6CBF2" android:layout_alignParentRight="true" android:id="@+id/mysearchGroups" android:textStyle="italic" android:text="mysearchGroups" android:layout_below="@+id/mysearchExclude"></TextView>
+
+</RelativeLayout>

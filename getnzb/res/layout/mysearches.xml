@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content" android:background="@drawable/background">
+<RelativeLayout android:layout_below="@+id/mysearchesHeaderText" android:id="@+id/RelativeLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="#162538"><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/mysearchesHeaderText" android:textColor="#D6CBF2" android:textStyle="bold" android:text="My Searches, click for search. Long click for options."></TextView></RelativeLayout>
+
+
+
+<ListView android:layout_below="@+id/RelativeLayout01" android:layout_height="fill_parent" android:layout_width="fill_parent" android:id="@+id/mysearcheslist"></ListView>
+</RelativeLayout>
