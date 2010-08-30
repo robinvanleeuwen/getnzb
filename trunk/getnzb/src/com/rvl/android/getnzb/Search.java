@@ -48,6 +48,7 @@ import org.htmlcleaner.XPatherException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.database.Cursor;
 
 import android.os.AsyncTask;
@@ -63,6 +64,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.rvl.android.getnzb.R;
@@ -118,6 +120,12 @@ public class Search extends Activity {
 		 		Log.d(Tags.LOG,"Searching in "+SEARCHCATEGORY);
 		 		new searchNZB().execute(SEARCHTERM, SEARCHCATEGORY); 		
 	    		break;
+		   	case R.id.buttonMynzbs:
+		   		Toast.makeText(this, "MyNZBs is not available yet...", Toast.LENGTH_SHORT).show();
+		   		break;
+		   	case R.id.buttonMysearches:
+		   		startMySearch();
+		   		break;
 	    	case R.id.btn_next:
 	    		if(HITLIST.length == 25){
 	    			HITLIST = null;
@@ -447,6 +455,11 @@ public class Search extends Activity {
 		}
     	
     }
+    
+	public void startMySearch(){
+		startActivity(new Intent(this,MySearch.class));
+	}
+    
     public void createSearchCategoryMapping(){
     	// Create search mapping for Category Spinner.
 		SEARCHCATEGORYHASHMAP.put("All Categories", "0");	
