@@ -167,6 +167,7 @@ public class Search extends Activity {
 	    	this.searchDialog.show();
 	    	Log.d(Tags.LOG, "Searching nzbs.org...");
 	    }
+	    
 	    protected Void doInBackground(final String... args){
 	    	Log.d(Tags.LOG,"* Starting searchNZB():");
    			if(!LOGGEDIN){
