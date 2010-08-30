@@ -238,6 +238,7 @@ public class GetNZB extends Activity {
 	};
     
 	public void startSearch(){
+		Search.SEARCHTERM = "";
 		startActivity(new Intent(this,Search.class));
 	}
 	

@@ -2,6 +2,8 @@ package com.rvl.android.getnzb;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -17,21 +19,33 @@ import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 import org.htmlcleaner.XPatherException;
 
+import com.rvl.android.getnzb.Search.downloadfile;
+import com.rvl.android.getnzb.Search.searchNZB;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.CursorJoiner.Result;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class MySearch extends Activity{
 	
+	public static String HITLIST[][];
 	public String[][] MYSEARCHES;
 	private boolean LOGGEDIN = GetNZB.LOGGEDIN;
 	private DefaultHttpClient httpclient = GetNZB.httpclient;
+	public boolean ENABLE_NEXTBUTTON = true;
+	public int CURRENT_PAGE = 1; 
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -88,22 +102,23 @@ public class MySearch extends Activity{
 				Object[] mysearchTable = node.evaluateXPath(xpath);
 				
 				this.n = mysearchTable.length;
-				Log.d(Tags.LOG,"N="+Integer.toString(this.n));
 				TagNode row = (TagNode) mysearchTable[0];
 				int numhits = row.getChildren().size() - 1;
-				Log.d(Tags.LOG,"Found "+Integer.toString(numhits)+" saved mySearches.");
 				
 				progresscounter += 5;
+				
 				this.mysearchesDialog.setProgress(progresscounter);
 				
 				TagNode a;
+				TagNode[] b;
 				String searchvalue;
 				String excludelist;
 				String groups;
 				String[][] foundMySearches = new String[numhits][2];
 				
 				for(int c=0;c<numhits;c++){
-					int counterincrement = 85 / numhits;
+					int counterincrement = 85 / numhits / 2;
+					
 					xpath = "//div[@class='content']/table[1]/tbody/tr["+Integer.toString(c+2)+"]";
 					mysearchTable = node.evaluateXPath(xpath);
 					row = (TagNode) mysearchTable[0];	
@@ -113,13 +128,19 @@ public class MySearch extends Activity{
 			
 					foundMySearches[c][0] = searchvalue;
 					
-					/*xpath = "//div[@class='content']/table[1]/tbody/tr["+Integer.toString(c+2)+"]/td/small";
+					progresscounter += counterincrement;
+					this.mysearchesDialog.setProgress(progresscounter);
+
+					
+					xpath = "//div[@class='content']/table[1]/tbody/tr["+Integer.toString(c+2)+"]/td/small";
 					mysearchTable = node.evaluateXPath(xpath);
 					row = (TagNode) mysearchTable[0];	
-					TagNode[] a = row.getAllElements(true);
-					Log.d(Tags.LOG,"FOUND:"+a[1].getText().toString());
-					Log.d(Tags.LOG,"VALUE:"+a[1].getAttributeByName("href").toString());
-					*/
+					b = row.getAllElements(true);
+					Log.d(Tags.LOG,"FOUND:"+b[1].getText().toString());
+					Log.d(Tags.LOG,"VALUE:"+b[1].getAttributeByName("href").toString());
+					
+					foundMySearches[c][1] = b[0].getAttributeByName("href").toString().replace("&amp;", "&");
+					
 					progresscounter += counterincrement;
 					this.mysearchesDialog.setProgress(progresscounter);
 
@@ -136,7 +157,9 @@ public class MySearch extends Activity{
 			
 			return null;
 		}
-
+		protected void onProgressUpdate(String message){
+			this.mysearchesDialog.setMessage(message);
+		}
 	
 		protected void onPostExecute(final Void unused){
 			Log.d(Tags.LOG,"Finishing...");
@@ -155,10 +178,24 @@ public class MySearch extends Activity{
     	// -- Bind the itemlist to the itemarray with the arrayadapter
     	ArrayList<String> items = new ArrayList<String>();
     	ArrayAdapter<String> aa = new MySearchRowAdapter(this,items);
-       	ListView itemlist = (ListView) findViewById(R.id.mysearcheslist);
-    	itemlist.setCacheColorHint(00000000);
-    	itemlist.setAdapter(aa);
-    	registerForContextMenu(itemlist);
+       	ListView mySearchList = (ListView) findViewById(R.id.mysearcheslist);
+    	mySearchList.setCacheColorHint(00000000);
+    	mySearchList.setAdapter(aa);
+    	registerForContextMenu(mySearchList);
+    	
+    	mySearchList.setOnItemClickListener(new OnItemClickListener(){   
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View v, int position,
+                            long id) {
+            				Log.d(Tags.LOG,"SEARCH:"+MYSEARCHES[position][1]);
+            				String[] values = MYSEARCHES[position][1].split("&");
+            				String q   = values[1].substring(2, values[1].length());
+            				String cat = values[2].substring(6, values[2].length());
+            				Search.SEARCHTERM = q;
+            				Search.SEARCHCATEGORY = cat;
+            				startSearch();
+            }       
+    	});
       	
     	for(int i=0;i<foundMySearches.length;i++){
     		item += foundMySearches[i][0];
@@ -169,16 +206,20 @@ public class MySearch extends Activity{
     	}
     	aa.notifyDataSetChanged();
 	}
+	public void startSearch(){
+		startActivity(new Intent(this,Search.class));
+	}
 	
-	
-	   public int getlastMatch(String searchPattern,String textString) {
-	       int index = -1;
-	       Pattern pattern = Pattern.compile(searchPattern);
-	       Matcher matcher = pattern.matcher(textString);
+	public int getlastMatch(String searchPattern,String textString) {
+		int index = -1;
+	    Pattern pattern = Pattern.compile(searchPattern);
+	    Matcher matcher = pattern.matcher(textString);
 
-	       while(matcher.find()) {
-	               index = matcher.start();
-	       }
-	       return index;
-	   }
+	    while(matcher.find()) {
+           index = matcher.start();
+	    }
+	    return index;
+	}
+	   
+
 }
