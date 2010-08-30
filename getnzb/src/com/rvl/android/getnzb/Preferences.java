@@ -26,8 +26,6 @@
 package com.rvl.android.getnzb;
 
 import com.rvl.android.getnzb.Tags;
-
-import com.rvl.android.getnzb.*;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.util.Log;

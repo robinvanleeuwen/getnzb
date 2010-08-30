@@ -2,13 +2,7 @@ package com.rvl.android.getnzb;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -18,24 +12,16 @@ import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 import org.htmlcleaner.XPatherException;
-
-import com.rvl.android.getnzb.Search.downloadfile;
-import com.rvl.android.getnzb.Search.searchNZB;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.CursorJoiner.Result;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class MySearch extends Activity{
@@ -55,7 +41,6 @@ public class MySearch extends Activity{
 	
 	private class getMySearches extends AsyncTask<String,Void,Void>{
 		ProgressDialog mysearchesDialog = new ProgressDialog(MySearch.this);
-		int n = 0;
 		
 		protected void onPreExecute(){
 			this.mysearchesDialog.setTitle("Please wait...");
@@ -101,7 +86,6 @@ public class MySearch extends Activity{
 				TagNode node = cleaner.clean(new InputStreamReader(entity.getContent()));
 				Object[] mysearchTable = node.evaluateXPath(xpath);
 				
-				this.n = mysearchTable.length;
 				TagNode row = (TagNode) mysearchTable[0];
 				int numhits = row.getChildren().size() - 1;
 				
@@ -112,8 +96,7 @@ public class MySearch extends Activity{
 				TagNode a;
 				TagNode[] b;
 				String searchvalue;
-				String excludelist;
-				String groups;
+	
 				String[][] foundMySearches = new String[numhits][2];
 				
 				for(int c=0;c<numhits;c++){
@@ -157,9 +140,6 @@ public class MySearch extends Activity{
 			
 			return null;
 		}
-		protected void onProgressUpdate(String message){
-			this.mysearchesDialog.setMessage(message);
-		}
 	
 		protected void onPostExecute(final Void unused){
 			Log.d(Tags.LOG,"Finishing...");
@@ -189,10 +169,8 @@ public class MySearch extends Activity{
                             long id) {
             				Log.d(Tags.LOG,"SEARCH:"+MYSEARCHES[position][1]);
             				String[] values = MYSEARCHES[position][1].split("&");
-            				String q   = values[1].substring(2, values[1].length());
-            				String cat = values[2].substring(6, values[2].length());
-            				Search.SEARCHTERM = q;
-            				Search.SEARCHCATEGORY = cat;
+            				Search.SEARCHTERM = values[1].substring(2, values[1].length());
+            				Search.SEARCHCATEGORY = values[2].substring(6, values[2].length());
             				startSearch();
             }       
     	});
@@ -209,17 +187,6 @@ public class MySearch extends Activity{
 	public void startSearch(){
 		startActivity(new Intent(this,Search.class));
 	}
-	
-	public int getlastMatch(String searchPattern,String textString) {
-		int index = -1;
-	    Pattern pattern = Pattern.compile(searchPattern);
-	    Matcher matcher = pattern.matcher(textString);
 
-	    while(matcher.find()) {
-           index = matcher.start();
-	    }
-	    return index;
-	}
-	   
 
 }

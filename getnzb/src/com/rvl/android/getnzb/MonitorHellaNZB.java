@@ -131,6 +131,7 @@ public class MonitorHellaNZB extends Activity{
 			manualQueueRefresh();
 		}
     }
+	@SuppressWarnings("unchecked")
 	public void stopCurrentDownload(){
 		HashMap<String,Object> globalinfo = (HashMap<String, Object>) HELLACONNECTION.call("status");
 		Object[] tt = (Object[]) globalinfo.get("currently_downloading");
@@ -139,8 +140,6 @@ public class MonitorHellaNZB extends Activity{
 			return;
 		}
 		else{
-			HashMap<String,Object> currdlinfo = (HashMap<String, Object>) tt[0];
-			String id = currdlinfo.get("id").toString();
 			HELLACONNECTION.call("cancel");
 			Toast.makeText(this, "Current download canceled...", Toast.LENGTH_SHORT).show();
 			manualQueueRefresh();

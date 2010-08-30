@@ -40,7 +40,7 @@ public class HellaNZB{
 	public boolean CONNECTED;
 	public XMLRPCClient client;	
 
-	public void HellaNZB(){
+	public HellaNZB(){
 		this.CONNECTED = false;
 	}
 	
