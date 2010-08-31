@@ -60,7 +60,7 @@ public class GetNZB extends Activity {
 	
 	public static boolean LOGGEDIN = false;
 	public static boolean HELLACONNECTED = false;
-	
+
 	public static final int MENU_PREFS = 0;
 	public static final int MENU_QUIT = 1;
 	public static final int MENU_ABOUT = 2;
@@ -166,6 +166,7 @@ public class GetNZB extends Activity {
     		else{
     			pd = ProgressDialog.show(GetNZB.this, "http://www.nzbs.org", "Logging in, please wait...");
     			login();
+    	
     		}
     		break;
     	case R.id.button_localnzb:
@@ -222,7 +223,9 @@ public class GetNZB extends Activity {
 						} catch (ClientProtocolException e) {
 							Log.d(Tags.LOG,"login(): ClientProtocolException: "+e.getMessage());
 						} catch (IOException e) {
+							httpclient = new DefaultHttpClient();
 							Log.d(Tags.LOG,"login(): IO Exception: "+e.getMessage());
+							Log.d(Tags.LOG,"login(): "+e.toString());
 						}
 				}
 				pd_handler.sendEmptyMessage(0);

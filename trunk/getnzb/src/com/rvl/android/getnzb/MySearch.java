@@ -18,10 +18,15 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class MySearch extends Activity{
@@ -39,6 +44,35 @@ public class MySearch extends Activity{
 		new getMySearches().execute();
 	}
 	
+	public void onCreateContextMenu(ContextMenu menu, View view,
+            ContextMenuInfo menuInfo) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.mysearchcontextmenu, menu);
+		super.onCreateContextMenu(menu, view, menuInfo);
+	}
+	
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		String localFileList[] = fileList();
+		switch(item.getItemId()){
+
+		case R.id.deleteMySearch:
+            deleteMySearch(info.id);
+            return true;
+		case R.id.editMySearch:
+			editMySearch(info.id);		
+			return true;
+	
+		}
+		
+		return false;
+	}
+	public void deleteMySearch(long id){
+		
+	}
+	public void editMySearch(long id){
+		Log.d(Tags.LOG,"editMySearch(): Clicked item "+id);
+	}
 	private class getMySearches extends AsyncTask<String,Void,Void>{
 		ProgressDialog mysearchesDialog = new ProgressDialog(MySearch.this);
 		
