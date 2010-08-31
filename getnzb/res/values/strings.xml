@@ -44,5 +44,8 @@
 	<string name="localFileList_infoFile">File Information</string>
 	<string name="localFileList_uploadFTP">Upload to FTP server</string>
 	<string name="localFileList_uploadHellaNZB">Upload to HellaNZB server</string>
+	
+	<string name="deleteMySearch">Delete Search</string>
+	<string name="editMySearch">Edit Search</string>
 
 </resources>
