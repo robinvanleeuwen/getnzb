@@ -2,12 +2,19 @@ package com.rvl.android.getnzb;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
@@ -15,6 +22,7 @@ import org.htmlcleaner.XPatherException;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -53,7 +61,6 @@ public class MySearch extends Activity{
 	
 	public boolean onContextItemSelected(MenuItem item) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-		String localFileList[] = fileList();
 		switch(item.getItemId()){
 
 		case R.id.deleteMySearch:
@@ -68,7 +75,36 @@ public class MySearch extends Activity{
 		return false;
 	}
 	public void deleteMySearch(long id){
+		// We get the URL of the delete page. So strip the searchID number of it.
+		String[] values = MYSEARCHES[(int) id][2].split("&");
+		String[] searchidvalues = values[1].split("=");
+		String searchid = searchidvalues[1];
 		
+		Log.d(Tags.LOG,"deleteMySearch(): deleting value:"+searchid);
+		
+		SharedPreferences pref = getSharedPreferences(Tags.PREFS, 0);
+		HttpPost post = new HttpPost(Tags.NZBS_LOGINPAGE);
+		
+		List<NameValuePair> nvp = new ArrayList<NameValuePair>(2);
+		nvp.add(new BasicNameValuePair("searchID",searchid));
+		nvp.add(new BasicNameValuePair("action","dodeletesearch"));
+
+		try {
+			post.setEntity(new UrlEncodedFormEntity(nvp));
+			HttpResponse response = httpclient.execute(post);
+			HttpEntity entity = response.getEntity();
+		} catch (UnsupportedEncodingException e) {
+			Log.d(Tags.LOG, "deleteMySearch():"+e.getMessage());
+		} catch (ClientProtocolException e) {
+			Log.d(Tags.LOG, "deleteMySearch():"+e.getMessage());
+		} catch (IOException e) {
+			Log.d(Tags.LOG, "deleteMySearch():"+e.getMessage());
+		}
+		
+		
+		
+		// Reload MySearches list.
+		new getMySearches().execute();
 	}
 	public void editMySearch(long id){
 		Log.d(Tags.LOG,"editMySearch(): Clicked item "+id);
@@ -90,6 +126,7 @@ public class MySearch extends Activity{
 				Log.d(Tags.LOG, "My Searches(): Not logged in...");
 				return null;
 			}
+			MYSEARCHES = null;
 			this.mysearchesDialog.setProgress(progresscounter);
 			
 			try {
@@ -131,7 +168,7 @@ public class MySearch extends Activity{
 				TagNode[] b;
 				String searchvalue;
 	
-				String[][] foundMySearches = new String[numhits][2];
+				String[][] foundMySearches = new String[numhits][3];
 				
 				for(int c=0;c<numhits;c++){
 					int counterincrement = 85 / numhits / 2;
@@ -151,12 +188,14 @@ public class MySearch extends Activity{
 					
 					xpath = "//div[@class='content']/table[1]/tbody/tr["+Integer.toString(c+2)+"]/td/small";
 					mysearchTable = node.evaluateXPath(xpath);
+					
+					// Get the Search link.
 					row = (TagNode) mysearchTable[0];	
 					b = row.getAllElements(true);
-					Log.d(Tags.LOG,"FOUND:"+b[1].getText().toString());
-					Log.d(Tags.LOG,"VALUE:"+b[1].getAttributeByName("href").toString());
-					
 					foundMySearches[c][1] = b[0].getAttributeByName("href").toString().replace("&amp;", "&");
+					
+					// Get the ID (which is in the Delete field URL)				
+					foundMySearches[c][2] = b[3].getAttributeByName("href").toString().replace("&amp;", "&");
 					
 					progresscounter += counterincrement;
 					this.mysearchesDialog.setProgress(progresscounter);
