@@ -23,8 +23,6 @@ public class MySearchRowAdapter extends ArrayAdapter<String>{
 		View row = inflater.inflate(R.layout.mysearchlist, null);
 		String values = items.get(position);
 		((TextView) row.findViewById(R.id.mysearchContent)).setText(values);
-		//((TextView) row.findViewById(R.id.mysearchExclude)).setText("Exclude: "+values[1]);
-		//((TextView) row.findViewById(R.id.mysearchGroups)).setText(values[2]);
 
 		return row;
 	}
