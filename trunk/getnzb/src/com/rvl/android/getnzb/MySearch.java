@@ -20,19 +20,23 @@ import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 import org.htmlcleaner.XPatherException;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
@@ -44,13 +48,38 @@ public class MySearch extends Activity{
 	private boolean LOGGEDIN = GetNZB.LOGGEDIN;
 	private DefaultHttpClient httpclient = GetNZB.httpclient;
 	public boolean ENABLE_NEXTBUTTON = true;
+	public static final int MENU_ADDMYSEARCH = 0;
 	public int CURRENT_PAGE = 1; 
+	
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.mysearches);
 		new getMySearches().execute();
 	}
+	
+	    public boolean onCreateOptionsMenu(Menu menu){
+	    	menu.add(0, MENU_ADDMYSEARCH, 0, "Add Search");
+    	return true;
+    }
+    
+    public boolean onOptionsItemSelected(MenuItem item){
+    	switch (item.getItemId()){
+    	case MENU_ADDMYSEARCH:
+    		addMySearchDialog();
+    		return true;
+    	}
+    	return false;
+    }
+    
+    public void addMySearchDialog(){
+    	Log.d(Tags.LOG,"Showing dialog");
+    	Dialog addSearchDialog = null;
+    	AddMySearchDialog.Builder builder = new AddMySearchDialog.Builder(this);
+    	
+    	addSearchDialog = builder.create();
+    	addSearchDialog.show();
+    }
 	
 	public void onCreateContextMenu(ContextMenu menu, View view,
             ContextMenuInfo menuInfo) {
