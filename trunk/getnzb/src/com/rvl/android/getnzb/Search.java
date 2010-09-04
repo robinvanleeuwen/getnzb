@@ -102,10 +102,7 @@ public class Search extends Activity {
 		
 	}
 	
-    public boolean onCreateOptionsMenu(Menu menu){
-    	menu.add(0, MENU_GETCART, 0, "Get Cart");
-    	return true;
-    }
+   
 	
     public boolean onOptionsItemSelected(MenuItem item){
     	switch (item.getItemId()){
