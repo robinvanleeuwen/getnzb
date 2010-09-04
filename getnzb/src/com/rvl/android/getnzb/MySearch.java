@@ -43,6 +43,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -160,6 +161,7 @@ public class MySearch extends Activity{
     			MODIFYEXCLUDE = "";
     			MODIFYGROUP = "";
     			setContentView(R.layout.mysearches);
+    			new getMySearches().execute();    			
     		break;
     	}
     }
@@ -183,7 +185,9 @@ public class MySearch extends Activity{
 		return false;
 	}
 	public void deleteMySearch(long id){
+		
 		// We get the URL of the delete page. So strip the searchID number of it.
+		
 		String[] values = MYSEARCHES[(int) id][2].split("&");
 		String[] searchidvalues = values[1].split("=");
 		String searchid = searchidvalues[1];
