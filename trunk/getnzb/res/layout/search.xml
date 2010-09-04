@@ -17,14 +17,15 @@ android:layout_width="fill_parent"
 android:entries="@array/searchCategory"
 android:id="@+id/spinnerCategory" android:layout_marginTop="10dip"></Spinner>
  
- <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/buttonMynzbs" android:textStyle="bold" android:width="160dip" android:layout_marginTop="10dip" android:layout_alignParentBottom="true" android:layout_marginBottom="10dip" android:onClick="btn_handler" android:text="My NZBs"></Button><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="My Searches" android:textStyle="bold" android:layout_alignParentRight="true" android:width="160dip" android:id="@+id/buttonMysearches" android:layout_marginTop="10dip" android:layout_alignParentBottom="true" android:layout_marginBottom="10dip" android:onClick="btn_handler"></Button>
  
- <Button android:layout_height="wrap_content" 
+ 
+ <Button android:layout_height="wrap_content" android:text="My Searches" android:textStyle="bold" android:layout_width="fill_parent" android:layout_alignParentBottom="true" android:onClick="btn_handler" android:id="@+id/buttonMySearches"></Button><Button android:layout_height="wrap_content" 
  android:layout_width="wrap_content" 
  android:layout_toRightOf="@+id/searchterm" 
  android:width="70dip" android:text="Go..."
  android:typeface="sans" android:id="@+id/btn_search"
  android:textStyle="bold" android:onClick="btn_handler" android:layout_marginTop="24dip"></Button>
+
 
 
 

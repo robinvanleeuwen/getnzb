@@ -129,10 +129,8 @@ public class Search extends Activity {
 		 		Log.d(Tags.LOG,"Searching in "+SEARCHCATEGORY);
 		 		new searchNZB().execute(SEARCHTERM, SEARCHCATEGORY); 		
 	    		break;
-		   	case R.id.buttonMynzbs:
-		   		Toast.makeText(this, "MyNZBs is not available yet...", Toast.LENGTH_SHORT).show();
-		   		break;
-		   	case R.id.buttonMysearches:
+		
+		   	case R.id.buttonMySearches:
 		   		startMySearch();
 		   		break;
 	    	case R.id.btn_next:

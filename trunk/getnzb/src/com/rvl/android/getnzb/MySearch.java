@@ -115,7 +115,14 @@ public class MySearch extends Activity{
 		HttpPost post = new HttpPost(Tags.NZBS_LOGINPAGE);
 		
 		List<NameValuePair> nvp = new ArrayList<NameValuePair>(2);
-		nvp.add(new BasicNameValuePair("action","doaddsearch"));
+		
+		if(!MODIFYSEARCH.equals("")){
+			nvp.add(new BasicNameValuePair("action","doeditsearch"));
+			nvp.add(new BasicNameValuePair("searchID",MODIFYSEARCH));				
+		}
+		else{
+			nvp.add(new BasicNameValuePair("action","doaddsearch"));
+		}
 		nvp.add(new BasicNameValuePair("searchText",term));
 		nvp.add(new BasicNameValuePair("searchFilter",exclude));
 		nvp.add(new BasicNameValuePair("catid",catid));
@@ -153,7 +160,6 @@ public class MySearch extends Activity{
     			MODIFYEXCLUDE = "";
     			MODIFYGROUP = "";
     			setContentView(R.layout.mysearches);
-    			new getMySearches().execute();
     		break;
     	}
     }
@@ -172,9 +178,6 @@ public class MySearch extends Activity{
 		case R.id.deleteMySearch:
             deleteMySearch(info.id);
             return true;
-		case R.id.editMySearch:
-			editMySearch(info.id);		
-			return true;
 		}
 		
 		return false;
@@ -211,7 +214,13 @@ public class MySearch extends Activity{
 		new getMySearches().execute();
 	}
 	public void editMySearch(long id){
-		Log.d(Tags.LOG,"editMySearch(): Clicked item "+id);
+		// Get ID
+		String[] values = MYSEARCHES[(int) id][2].split("&");
+		String[] searchidvalues = values[1].split("=");
+		MODIFYSEARCH = searchidvalues[1];
+		
+		
+		
 	}
 	
 	
