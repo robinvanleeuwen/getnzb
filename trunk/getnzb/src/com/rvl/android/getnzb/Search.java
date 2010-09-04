@@ -49,6 +49,7 @@ import org.htmlcleaner.XPatherException;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 
 import android.os.AsyncTask;
@@ -87,6 +88,8 @@ public class Search extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		Log.d(Tags.LOG, "- Starting search activity -");
 		super.onCreate(savedInstanceState);
+	 	this.setRequestedOrientation(
+    			ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		setContentView(R.layout.search);
 		if(!SEARCHTERM.equals("")){
 			new searchNZB().execute(SEARCHTERM, SEARCHCATEGORY);

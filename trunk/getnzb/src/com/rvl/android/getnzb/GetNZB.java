@@ -46,6 +46,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -83,6 +84,8 @@ public class GetNZB extends Activity {
     public void onCreate(Bundle savedInstanceState) {
     	Log.d(Tags.LOG,"------ STARTING GETNZB ------");
     	super.onCreate(savedInstanceState);
+    	this.setRequestedOrientation(
+    			ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.login);
         preferences = getSharedPreferences(Tags.PREFS,0);
         builder = new AlertDialog.Builder(this);

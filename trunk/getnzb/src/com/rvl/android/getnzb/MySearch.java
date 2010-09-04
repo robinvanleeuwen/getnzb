@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -25,6 +26,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,6 +42,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -54,10 +57,19 @@ public class MySearch extends Activity{
 	public int CURRENT_PAGE = 1; 
 	public static ProgressDialog pd = null;
 	public static String ADDSEARCHQUERY = "";
+	public static String MODIFYSEARCH = "";
+	public static String MODIFYTERM = "";
+	public static String MODIFYEXCLUDE = "";
+	public static String MODIFYGROUP = "";
+	public static HashMap<String,String> MYSEARCHCATEGORYHASHMAP = new HashMap<String,String>();
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+	 	this.setRequestedOrientation(
+    			ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		setContentView(R.layout.mysearches);	
+		createSearchCategoryMapping();
+
 		new getMySearches().execute();
 	}
 	
@@ -69,20 +81,83 @@ public class MySearch extends Activity{
     public boolean onOptionsItemSelected(MenuItem item){
     	switch (item.getItemId()){
     	case MENU_ADDMYSEARCH:
-    		addMySearchDialog();
+    		addOrModifySearch();
     		return true;
     	}
     	return false;
     }
     
-    public void addMySearchDialog(){
-    	Log.d(Tags.LOG,"Showing dialog");
-    	Dialog addSearchDialog = null;
-    	AddMySearchDialog.Builder builder = new AddMySearchDialog.Builder(this);  	
-    	addSearchDialog = builder.create();
-    	addSearchDialog.show();
+    public void addOrModifySearch(){
+    	setContentView(R.layout.addmysearch);
+    	// If it's a modify, fill the fields.
+    	if(!MODIFYSEARCH.equals("")){
+    		EditText searchTerm = (EditText) findViewById(R.id.editTextSearchTerm);
+    		searchTerm.setText(MODIFYTERM);
+    		   		
+    		EditText excludeTerm = (EditText) findViewById(R.id.editTextExcludeTerm);   		
+    		excludeTerm.setText(MODIFYEXCLUDE);
+    	}
+   
     }
-	
+    
+    public void saveMySearch(){
+    	EditText searchTerm = (EditText) findViewById(R.id.editTextSearchTerm);
+		String   term = searchTerm.getText().toString();
+		
+		EditText excludeTerm = (EditText) findViewById(R.id.editTextExcludeTerm);
+		String exclude = excludeTerm.getText().toString();
+		
+		
+		Spinner searchGroup = (Spinner) findViewById(R.id.spinnerAddMySearchGroup);
+		String catid = MYSEARCHCATEGORYHASHMAP.get(searchGroup.getSelectedItem().toString());
+		
+		DefaultHttpClient httpclient = GetNZB.httpclient;
+		HttpPost post = new HttpPost(Tags.NZBS_LOGINPAGE);
+		
+		List<NameValuePair> nvp = new ArrayList<NameValuePair>(2);
+		nvp.add(new BasicNameValuePair("action","doaddsearch"));
+		nvp.add(new BasicNameValuePair("searchText",term));
+		nvp.add(new BasicNameValuePair("searchFilter",exclude));
+		nvp.add(new BasicNameValuePair("catid",catid));
+
+		try {
+			post.setEntity(new UrlEncodedFormEntity(nvp));
+			HttpResponse response = httpclient.execute(post);
+			HttpEntity entity = response.getEntity();
+			
+				if(entity != null) entity.consumeContent();					
+			
+		} catch (UnsupportedEncodingException e) {
+			Log.d(Tags.LOG,"addMySearch(): UnsupportedEncodingException: "+e.getMessage());
+		} catch (ClientProtocolException e) {
+			Log.d(Tags.LOG,"addMySearch(): ClientProtocolException: "+e.getMessage());
+		} catch (IOException e) {
+			httpclient = new DefaultHttpClient();
+			Log.d(Tags.LOG,"addMySearch(): IO Exception: "+e.getMessage());
+			Log.d(Tags.LOG,"addMySearch(): "+e.toString());
+		}
+		
+	    
+    }
+    
+    public void MySearchButtonHandler(View v){
+    	switch(v.getId()){
+    		case R.id.buttonAddMySearchSave:
+    			saveMySearch();
+    			setContentView(R.layout.mysearches);
+    			new getMySearches().execute();
+    		break;
+    		case R.id.buttonAddMySearchCancel:
+    			MODIFYSEARCH = "";
+    			MODIFYTERM = "";
+    			MODIFYEXCLUDE = "";
+    			MODIFYGROUP = "";
+    			setContentView(R.layout.mysearches);
+    			new getMySearches().execute();
+    		break;
+    	}
+    }
+  
 	public void onCreateContextMenu(ContextMenu menu, View view,
             ContextMenuInfo menuInfo) {
 		MenuInflater inflater = getMenuInflater();
@@ -292,5 +367,42 @@ public class MySearch extends Activity{
 		startActivity(new Intent(this,Search.class));
 	}
 
+    
+    public void createSearchCategoryMapping(){
+    	MYSEARCHCATEGORYHASHMAP.clear();
+    	// Create search mapping for Category Spinner.
+		MYSEARCHCATEGORYHASHMAP.put("All Categories", "0");	
+		//MYSEARCHCATEGORYHASHMAP.put("Movies","t2");
+		MYSEARCHCATEGORYHASHMAP.put("Movies-DVD","9");
+		MYSEARCHCATEGORYHASHMAP.put("Movies-WMV-HD","12");
+		MYSEARCHCATEGORYHASHMAP.put("Movies-x264","4");
+		MYSEARCHCATEGORYHASHMAP.put("Movies-XviD","2");
+		//MYSEARCHCATEGORYHASHMAP.put("TV","t1");
+		MYSEARCHCATEGORYHASHMAP.put("TV-DVD","11");
+		MYSEARCHCATEGORYHASHMAP.put("TV-FGN","24");
+		MYSEARCHCATEGORYHASHMAP.put("TV-H264","22");
+		MYSEARCHCATEGORYHASHMAP.put("TV-x264","14");
+		MYSEARCHCATEGORYHASHMAP.put("TV-XviD","1");
+		//MYSEARCHCATEGORYHASHMAP.put("XXX","t4");
+		MYSEARCHCATEGORYHASHMAP.put("XXX-DVD","13");
+		MYSEARCHCATEGORYHASHMAP.put("XXX-Pack","25");
+		MYSEARCHCATEGORYHASHMAP.put("XXX-WMV","21");
+		MYSEARCHCATEGORYHASHMAP.put("XXX-x264","23");
+		MYSEARCHCATEGORYHASHMAP.put("XXX-XviD","3");
+		//MYSEARCHCATEGORYHASHMAP.put("PC","t5");
+		MYSEARCHCATEGORYHASHMAP.put("PC-0day","7");
+		MYSEARCHCATEGORYHASHMAP.put("PC-ISO","6");
+		MYSEARCHCATEGORYHASHMAP.put("PC-Mac","15");
+		//MYSEARCHCATEGORYHASHMAP.put("Music","t3");
+		MYSEARCHCATEGORYHASHMAP.put("Music-MP3","5");
+		MYSEARCHCATEGORYHASHMAP.put("Music-Video","10");
+		//MYSEARCHCATEGORYHASHMAP.put("Console","t6");
+		MYSEARCHCATEGORYHASHMAP.put("Console-NDS","19");
+		MYSEARCHCATEGORYHASHMAP.put("Console-PSP","16");
+		MYSEARCHCATEGORYHASHMAP.put("Console-Wii","17");
+		MYSEARCHCATEGORYHASHMAP.put("Console-XBox","8");
+		MYSEARCHCATEGORYHASHMAP.put("Console-XBox360","20");
+    }
+	
 
 }

@@ -26,6 +26,8 @@
 package com.rvl.android.getnzb;
 
 import com.rvl.android.getnzb.Tags;
+
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.util.Log;
@@ -33,6 +35,8 @@ import android.util.Log;
 public class Preferences extends PreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		Log.d(Tags.LOG, "Starting preference acticity");
+	 	this.setRequestedOrientation(
+    			ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		super.onCreate(savedInstanceState);
 		getPreferenceManager().setSharedPreferencesName(Tags.PREFS);
 		addPreferencesFromResource(R.layout.preferences);

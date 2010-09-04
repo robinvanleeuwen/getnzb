@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout android:id="@+id/RelativeLayout01" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:background="@drawable/background"><RelativeLayout android:layout_height="wrap_content" android:layout_width="fill_parent" android:background="#162538" android:id="@+id/headerAddMySearch"><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/addMySearchTitle" android:text="Add / Modify Search" android:textColor="#D6CBF2" android:textSize="25dip" android:textStyle="bold" android:layout_centerHorizontal="true" android:layout_below="@+id/headerAddMySearch" android:paddingBottom="5dip" android:paddingTop="5dip"></TextView></RelativeLayout><Spinner android:layout_toRightOf="@+id/textSearchTerm" android:layout_height="wrap_content" android:id="@+id/spinnerAddMySearchGroup" android:layout_width="fill_parent" android:layout_below="@+id/editTextExcludeTerm" android:entries="@array/MySearchCategory"></Spinner><Button android:layout_height="wrap_content" android:id="@+id/buttonAddMySearchCancel" android:layout_toRightOf="@+id/buttonAddMySearchSave" android:layout_width="160dip" android:text="Cancel" android:textStyle="bold" android:layout_alignParentBottom="true" android:onClick="MySearchButtonHandler"></Button><Button android:layout_height="wrap_content" android:text="Save" android:textStyle="bold" android:id="@+id/buttonAddMySearchSave" android:layout_width="160dip" android:layout_alignParentBottom="true" android:onClick="MySearchButtonHandler"></Button>
+
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/headerAddMySearch" android:textColor="#D6CBF2" android:text="Search for : " android:textStyle="bold" android:paddingLeft="2dip" android:paddingTop="3dip" android:id="@+id/textSearchTerm"></TextView>
+<EditText android:layout_height="wrap_content" android:layout_below="@+id/headerAddMySearch" android:layout_toRightOf="@+id/textSearchTerm" android:layout_width="fill_parent" android:id="@+id/editTextSearchTerm"></EditText>
+<EditText android:layout_height="wrap_content" android:layout_toRightOf="@+id/textSearchTerm" android:layout_width="fill_parent" android:id="@+id/editTextExcludeTerm" android:layout_below="@+id/editTextSearchTerm"></EditText><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Group :" android:textStyle="bold" android:textColor="#D6CBF2" android:id="@+id/textGroup" android:layout_below="@+id/editTextExcludeTerm"></TextView><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#D6CBF2" android:textStyle="bold" android:text="Exclude : " android:paddingLeft="2dip" android:id="@+id/textExclude" android:layout_below="@+id/editTextSearchTerm"></TextView>
+
+
+
+
+
+
+</RelativeLayout>
