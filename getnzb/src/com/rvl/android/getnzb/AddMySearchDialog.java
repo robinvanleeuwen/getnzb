@@ -1,19 +1,31 @@
 package com.rvl.android.getnzb;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.Spinner;
 
 public class AddMySearchDialog extends Dialog{
+
 	
+
 	public AddMySearchDialog(Context context, int theme){
 		super(context, theme);
 	}
@@ -24,33 +36,12 @@ public class AddMySearchDialog extends Dialog{
 	
 	public static class Builder{
 		private Context context;
-		private String title;
-		private String message;
-		private View contentView;
-		
-		private DialogInterface.OnClickListener addButtonOnClickListener,
-												cancelButtonOnClickListener;
-		
+	
 		public Builder(Context context){
 			this.context = context;
 		}
 				
-		public Builder setContentView(View v){
-			this.contentView = v;
-			return this;
-		}
-		
-		public Builder setAddButton(DialogInterface.OnClickListener listener){
-			
-			this.addButtonOnClickListener = listener;
-			return this;
-		}
-		
-		public Builder setCancelButton(DialogInterface.OnClickListener listener){
-			
-			this.cancelButtonOnClickListener = listener;
-			return this;
-		}
+
 		public AddMySearchDialog create(){
 			LayoutInflater inflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -62,30 +53,56 @@ public class AddMySearchDialog extends Dialog{
 			dialog.addContentView(layout, new LayoutParams(
 					LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
 			
+			
 			((Button) layout.findViewById(R.id.buttonAddMySearch)).setOnClickListener(
 				new View.OnClickListener(){
 	    		@Override
 				public void onClick(View v) {   			
-	    			String[] values;
 	    			
 	    			// Get the search query
 	    			EditText searchTerm = (EditText) layout.findViewById(R.id.addMySearchTerm);
-	    			String term = searchTerm.getText().toString().replaceAll(" ", "+");
+	    			String term = searchTerm.getText().toString();
+	    			
 	    			
 	    			// Get the filter
 	    			EditText searchFilter = (EditText) layout.findViewById(R.id.addMySearchWithout);
-	    			values = searchFilter.getText().toString().split(" ");
-	    			String filter = "";
-	    			for(int c=0;c<values.length;c++){
-	    				filter += "--"+values[c]+"+";
-	    			}
-	    			if(filter.equals("--+")) filter = ""; // No excludes where given.
-	    			if(!filter.equals("")) filter = filter.substring(0, filter.length()-1); // Remove last +
+	    			String filter = searchFilter.getText().toString();
 	    			
-	    			
-	    			Log.d(Tags.LOG,"Filter:"+term+"+"+filter);
-	    			
+	    			// Get the category
+			 		Spinner categorySpinner = (Spinner) layout.findViewById(R.id.addMySearchGroup);
+			 		String catid = Search.SEARCHCATEGORYHASHMAP.get(categorySpinner.getSelectedItem().toString());
+	    				    			
+	    			//------------------------
+	    			DefaultHttpClient httpclient = GetNZB.httpclient;
+	    				HttpPost post = new HttpPost(Tags.NZBS_LOGINPAGE);
+	    				
+	    				List<NameValuePair> nvp = new ArrayList<NameValuePair>(2);
+	    				nvp.add(new BasicNameValuePair("action","doaddsearch"));
+	    				nvp.add(new BasicNameValuePair("searchText",term));
+	    				nvp.add(new BasicNameValuePair("searchFilter",filter));
+	    				nvp.add(new BasicNameValuePair("catid",catid));
+
+	    				try {
+	    					post.setEntity(new UrlEncodedFormEntity(nvp));
+	    					HttpResponse response = httpclient.execute(post);
+	    					HttpEntity entity = response.getEntity();
+	    					
+	   						if(entity != null) entity.consumeContent();					
+	    					
+	    				} catch (UnsupportedEncodingException e) {
+	    					Log.d(Tags.LOG,"addMySearch(): UnsupportedEncodingException: "+e.getMessage());
+	    				} catch (ClientProtocolException e) {
+	    					Log.d(Tags.LOG,"addMySearch(): ClientProtocolException: "+e.getMessage());
+	    				} catch (IOException e) {
+	    					httpclient = new DefaultHttpClient();
+	    					Log.d(Tags.LOG,"addMySearch(): IO Exception: "+e.getMessage());
+	    					Log.d(Tags.LOG,"addMySearch(): "+e.toString());
+	    				}
+	    				
+	    				dialog.dismiss();
+	    				
 	    		}
+	    	
 			});
 			
 			((Button) layout.findViewById(R.id.buttonCancelMySearch)).setOnClickListener(
@@ -102,5 +119,6 @@ public class AddMySearchDialog extends Dialog{
 			return dialog;
 		}
 	}
+
 	
 }
