@@ -7,6 +7,7 @@ import java.util.TimerTask;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -39,6 +40,8 @@ public class MonitorHellaNZB extends Activity{
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+	 	this.setRequestedOrientation(
+    			ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		setContentView(R.layout.monitorhellanzb);
 		SharedPreferences prefs = GetNZB.preferences;
 		REFRESH_INTERVAL = Integer.parseInt(prefs.getString("updateNewsgrabberInterval", "8000"));

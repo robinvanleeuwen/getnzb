@@ -42,6 +42,7 @@ import com.rvl.android.getnzb.Tags;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -78,6 +79,8 @@ public class LocalNZB extends Activity {
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+	 	this.setRequestedOrientation(
+    			ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		Log.d(Tags.LOG,"- Starting LocalNZB Activity!");	
 		setContentView(R.layout.localnzb);
 	
