@@ -27,6 +27,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -50,11 +52,12 @@ public class MySearch extends Activity{
 	public boolean ENABLE_NEXTBUTTON = true;
 	public static final int MENU_ADDMYSEARCH = 0;
 	public int CURRENT_PAGE = 1; 
-	
+	public static ProgressDialog pd = null;
+	public static String ADDSEARCHQUERY = "";
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.mysearches);
+		setContentView(R.layout.mysearches);	
 		new getMySearches().execute();
 	}
 	
@@ -75,8 +78,7 @@ public class MySearch extends Activity{
     public void addMySearchDialog(){
     	Log.d(Tags.LOG,"Showing dialog");
     	Dialog addSearchDialog = null;
-    	AddMySearchDialog.Builder builder = new AddMySearchDialog.Builder(this);
-    	
+    	AddMySearchDialog.Builder builder = new AddMySearchDialog.Builder(this);  	
     	addSearchDialog = builder.create();
     	addSearchDialog.show();
     }
@@ -98,7 +100,6 @@ public class MySearch extends Activity{
 		case R.id.editMySearch:
 			editMySearch(info.id);		
 			return true;
-	
 		}
 		
 		return false;
@@ -110,8 +111,7 @@ public class MySearch extends Activity{
 		String searchid = searchidvalues[1];
 		
 		Log.d(Tags.LOG,"deleteMySearch(): deleting value:"+searchid);
-		
-		SharedPreferences pref = getSharedPreferences(Tags.PREFS, 0);
+	
 		HttpPost post = new HttpPost(Tags.NZBS_LOGINPAGE);
 		
 		List<NameValuePair> nvp = new ArrayList<NameValuePair>(2);
@@ -138,7 +138,9 @@ public class MySearch extends Activity{
 	public void editMySearch(long id){
 		Log.d(Tags.LOG,"editMySearch(): Clicked item "+id);
 	}
-	private class getMySearches extends AsyncTask<String,Void,Void>{
+	
+	
+	class getMySearches extends AsyncTask<String,Void,Void>{
 		ProgressDialog mysearchesDialog = new ProgressDialog(MySearch.this);
 		
 		protected void onPreExecute(){
