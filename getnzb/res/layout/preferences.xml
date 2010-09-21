@@ -66,6 +66,7 @@
 			/>
   	
   </PreferenceCategory>  
+
   <PreferenceCategory android:title="FTP Server preferences" >
   <EditTextPreference 
 			android:key="FTPHostname" 
@@ -98,5 +99,19 @@
 			android:defaultValue="@string/preferencesFTPUploadPathDefault"
 			android:password="false" />		
   </PreferenceCategory>
-    
+  <PreferenceCategory android:title="Dropbox preferences">
+   <EditTextPreference 
+			android:key="dropboxAccount" 
+			android:title="Dropbox Account" 
+			android:summary="@string/preferencesDropboxUsername"
+			android:defaultValue=""
+			/>		
+   <EditTextPreference 
+			android:key="dropboxPassword" 
+			android:title="Dropbox Password" 
+			android:summary="@string/preferencesDropboxPassword"
+			android:defaultValue=""
+			android:password="true" 
+			/>		
+  </PreferenceCategory>    
 </PreferenceScreen>
