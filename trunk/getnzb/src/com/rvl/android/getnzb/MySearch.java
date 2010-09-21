@@ -250,6 +250,7 @@ public class MySearch extends Activity{
 			
 			try {
 				String url = "http://nzbs.org/user.php?action=mysearches";
+				Log.d(Tags.LOG,"Retrieving MySearches...");
 				// Construct parser
 				HtmlCleaner cleaner = new HtmlCleaner();
 				CleanerProperties clProp = cleaner.getProperties();
@@ -260,7 +261,7 @@ public class MySearch extends Activity{
 				
 				progresscounter += 5;
 				this.mysearchesDialog.setProgress(progresscounter);
-
+	
 				// Get page
 				HttpGet httpget = new HttpGet(url);
 				HttpResponse httpresponse;			
@@ -271,48 +272,46 @@ public class MySearch extends Activity{
 				this.mysearchesDialog.setProgress(progresscounter);
 				
 				// Constuct the XPath stuff...
+				String xpath = "//table[@id='msList']/tbody";
 				
-				String xpath = "//div[@class='content']/table[1]/tbody";
 				TagNode node = cleaner.clean(new InputStreamReader(entity.getContent()));
 				Object[] mysearchTable = node.evaluateXPath(xpath);
 				
 				TagNode row = (TagNode) mysearchTable[0];
-				int numhits = row.getChildren().size() - 1;
-				
+				int numhits = row.getChildren().size();
+	
 				progresscounter += 5;
 				
 				this.mysearchesDialog.setProgress(progresscounter);
-				
-				TagNode a;
+				TagNode a,a2;
 				TagNode[] b;
-				String searchvalue;
 	
 				String[][] foundMySearches = new String[numhits][3];
-				
+				xpath = "//table[@id='msList']/tbody"; //"+Integer.toString(c+1)+"]";
+				mysearchTable = node.evaluateXPath(xpath);
+				row = (TagNode) mysearchTable[0];
+				Object[] mysearchRow;
+				String[] searchTermValues;
+				String searchTerm;
 				for(int c=0;c<numhits;c++){
 					int counterincrement = 85 / numhits / 2;
 					
-					xpath = "//div[@class='content']/table[1]/tbody/tr["+Integer.toString(c+2)+"]";
-					mysearchTable = node.evaluateXPath(xpath);
-					row = (TagNode) mysearchTable[0];	
-					a = (TagNode) row.getChildren().get(0);
-					searchvalue = a.getText().toString();
-					searchvalue = searchvalue.substring(0, searchvalue.length()-36); // Trim &&[search][rss][..][..]
-			
-					foundMySearches[c][0] = searchvalue;
+					a = (TagNode) row.getChildren().get(c);
+					searchTerm = a.getText().toString();
+					searchTermValues = searchTerm.split("&nbsp");
+					searchTerm = searchTermValues[0];
+					searchTerm = searchTerm.substring(12);
+					xpath = "//td/small";
+					mysearchRow = a.evaluateXPath(xpath);
 					
+					a2 = (TagNode) mysearchRow[0];
+					
+					b = a2.getAllElements(true);
 					progresscounter += counterincrement;
 					this.mysearchesDialog.setProgress(progresscounter);
-
-					
-					xpath = "//div[@class='content']/table[1]/tbody/tr["+Integer.toString(c+2)+"]/td/small";
-					mysearchTable = node.evaluateXPath(xpath);
-					
-					// Get the Search link.
-					row = (TagNode) mysearchTable[0];	
-					b = row.getAllElements(true);
+							
+					foundMySearches[c][0] = searchTerm;
 					foundMySearches[c][1] = b[0].getAttributeByName("href").toString().replace("&amp;", "&");
-					
 					// Get the ID (which is in the Delete field URL)				
 					foundMySearches[c][2] = b[3].getAttributeByName("href").toString().replace("&amp;", "&");
 					

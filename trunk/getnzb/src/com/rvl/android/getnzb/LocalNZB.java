@@ -108,9 +108,15 @@ public class LocalNZB extends Activity {
 		case R.id.uploadLocalFileFTP:
 			uploadLocalFileFTP(localFileList[(int) info.id]);
 			return true;
+		case R.id.uploadLocalFileDropbox:
+			uploadLocalFileDropbox(localFileList[(int) info.id]);
+			return true;
 		}
 		
 		return false;
+	}
+	public void uploadLocalFileDropbox(String filename){
+		
 	}
 	
 	public void uploadLocalFileHellaNZB(String filename){

@@ -7,5 +7,6 @@
 		android:id="@+id/uploadLocalFileFTP" android:title="@string/localFileList_uploadFTP"/>
 		<item 
 		android:id="@+id/uploadLocalFileHellaNZB" android:title="@string/localFileList_uploadHellaNZB"/>
-		
+		<item
+		android:id="@+id/uploadLocalFileDropbox" android:title="@string/localFileList_uploadDropbox"/>
 </menu>
