@@ -236,42 +236,34 @@ public class Search extends Activity {
 				this.n = numhits;
 				int counterincrement = 88 / numhits;
 				String[][] hit = new String[numhits][5];
-			
-				TagNode a;
-				TagNode b;
-				TagNode atag;
-				
+							
 				progresscounter += 5;
 				this.searchDialog.setProgress(progresscounter);
+				
+				Object[] tempObject;
 				for(int c=0;c<numhits;c++){
 					xpathRows = "//table[@id='nzbtable']/tbody/tr["+Integer.toString(c+3)+"]";
 					nzbTable = node.evaluateXPath(xpathRows);				
 	
 					// Name
-					
-					row = (TagNode) nzbTable[0];
-					a = (TagNode) row.getChildren().get(1);
-					b = (TagNode) a.getChildren().get(0);
-					hit[c][0] = b.getText().toString();
+					tempObject = ((TagNode)nzbTable[0]).evaluateXPath("//td[2]/b/a");				
+					hit[c][0] = ((TagNode)tempObject[0]).getText().toString();
 					
 					// Category
-					a = (TagNode) row.getChildren().get(2);
-					b = (TagNode) a.getChildren().get(0);
-					hit[c][4] = b.getText().toString();
+					tempObject = ((TagNode)nzbTable[0]).evaluateXPath("//td[3]/a");
+					hit[c][4] = ((TagNode)tempObject[0]).getText().toString();
 					
 					// Days ago
-					a = (TagNode) row.getChildren().get(3);
-					hit[c][1] = a.getText().toString();
+					tempObject = ((TagNode)nzbTable[0]).evaluateXPath("//td[4]");
+					hit[c][1] = ((TagNode)tempObject[0]).getText().toString();
 					
 					// Size
-					a = (TagNode) row.getChildren().get(4);    					
-					hit[c][2] = a.getText().toString();
+					tempObject = ((TagNode)nzbTable[0]).evaluateXPath("//td[5]");					
+					hit[c][2] = ((TagNode)tempObject[0]).getText().toString();
+			
 					// Download link
-					
-					xpathLink = xpathRows+"/td[8]/b/a";
-					Object[] link     = node.evaluateXPath(xpathLink);
-					atag = (TagNode) link[0];
-					hit[c][3] = atag.getAttributeByName("href").replaceAll("&amp;", "&"); 
+					tempObject = ((TagNode)nzbTable[0]).evaluateXPath("//td[8]/b/a");
+					hit[c][3] = ((TagNode)tempObject[0]).getAttributeByName("href").replaceAll("&amp;", "&"); 
 					
 					progresscounter += counterincrement;
 					this.searchDialog.setProgress(progresscounter);
@@ -292,8 +284,7 @@ public class Search extends Activity {
 		protected void onPostExecute(final Void unused){
     		this.searchDialog.dismiss();
     		TextView statusbar = (TextView) findViewById(R.id.statusbar);
-    		// String num_hits = Integer.toString(hitlist.length);
-    		// String num_hits = "test";
+    	
     		String status = "";
     		if(!LOGGEDIN){
     			status = "Not logged in! Check NZB account settings..."; 
