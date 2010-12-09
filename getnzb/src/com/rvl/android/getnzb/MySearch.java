@@ -250,7 +250,7 @@ public class MySearch extends Activity{
 			
 			try {
 				String url = "http://nzbs.org/user.php?action=mysearches";
-				Log.d(Tags.LOG,"Retrieving MySearches...");
+				Log.d(Tags.LOG,"Retrieving MySearches...proxy");
 				// Construct parser
 				HtmlCleaner cleaner = new HtmlCleaner();
 				CleanerProperties clProp = cleaner.getProperties();

@@ -99,7 +99,9 @@
 			android:defaultValue="@string/preferencesFTPUploadPathDefault"
 			android:password="false" />		
   </PreferenceCategory>
+<!--
   <PreferenceCategory android:title="Dropbox preferences">
+ 
    <EditTextPreference 
 			android:key="dropboxAccount" 
 			android:title="Dropbox Account" 
@@ -113,5 +115,7 @@
 			android:defaultValue=""
 			android:password="true" 
 			/>		
-  </PreferenceCategory>    
+
+  </PreferenceCategory>   
+   --> 
 </PreferenceScreen>

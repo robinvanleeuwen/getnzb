@@ -72,6 +72,8 @@ public class LocalNZB extends Activity {
 	public static final int CONNECT_FAILED_NO_SETTINGS = 2;
 	public static final int CONNECT_FAILED_OTHER = 3;
 	public static String UPLOADFILENAME = "";
+	public boolean isUploadedFTP = false;
+	public String FTPErrorCode = "";
     public NZBDatabase LocalNZBMetadata = new NZBDatabase(this);
     
 	static ProgressDialog UPLOADDIALOG = null;
@@ -108,9 +110,10 @@ public class LocalNZB extends Activity {
 		case R.id.uploadLocalFileFTP:
 			uploadLocalFileFTP(localFileList[(int) info.id]);
 			return true;
-		case R.id.uploadLocalFileDropbox:
+		/*case R.id.uploadLocalFileDropbox:
 			uploadLocalFileDropbox(localFileList[(int) info.id]);
 			return true;
+		*/
 		}
 		
 		return false;
@@ -160,6 +163,7 @@ public class LocalNZB extends Activity {
 	public void uploadLocalFileFTP(String filename){
 		UPLOADFILENAME = filename;
 		
+		
 		UPLOADDIALOG = ProgressDialog.show(this, "Please wait...", "Uploading '"+filename+"' to FTP server.");
 		   		
 		SharedPreferences prefs = GetNZB.preferences;
@@ -174,7 +178,9 @@ public class LocalNZB extends Activity {
 		public void run(){
 			SharedPreferences prefs = GetNZB.preferences;
 			FTPClient ftp = new FTPClient();
-			String FTPHostname = prefs.getString("FTPHostname","");
+			
+			String replycode = "";
+			String FTPHostname =prefs.getString("FTPHostname","");
 			String FTPUsername = prefs.getString("FTPUsername", "anonymous");
 			String FTPPassword = prefs.getString("FTPPassword","my@email.address");
 			String FTPPort     = prefs.getString("FTPPort","21");
@@ -186,6 +192,7 @@ public class LocalNZB extends Activity {
 			String targetFile = FTPUploadPath+UPLOADFILENAME;
 			
 			try {
+				
 				ftp.connect(FTPHostname,Integer.parseInt(FTPPort));
 				if(ftp.login(FTPUsername, FTPPassword)){
 
@@ -196,9 +203,13 @@ public class LocalNZB extends Activity {
 					Log.d(Tags.LOG,"Saving file to:"+targetFile);
 					if(ftp.storeFile(targetFile, buffIn)){
 						Log.d(Tags.LOG,"FTP: File should be uploaded. Replycode: "+Integer.toString(ftp.getReplyCode()));
+						
+						isUploadedFTP = true;
 					}
 					else{
 						Log.d(Tags.LOG,"FTP: Could not upload file  Replycode: "+Integer.toString(ftp.getReplyCode()));
+						FTPErrorCode = Integer.toString(ftp.getReplyCode());
+						isUploadedFTP = false;
 					}
 				
 					buffIn.close();
@@ -216,10 +227,12 @@ public class LocalNZB extends Activity {
 					Log.d(Tags.LOG,"ftp(): "+e.getMessage());
 					return;
 				}
-				removeLocalNZBFile(UPLOADFILENAME);
+				if(isUploadedFTP){
+					removeLocalNZBFile(UPLOADFILENAME);
+				}
 				
 				UPLOADFILENAME = "";
-				uploadDialogHandler.sendEmptyMessage(0);
+				uploadDialogHandlerFTP.sendEmptyMessage(0);
 			}
 		
 		}.start();
@@ -242,6 +255,7 @@ public class LocalNZB extends Activity {
     	TextView statusbar = (TextView) findViewById(R.id.hellaStatus);
     	statusbar.setText("Local files. Click to upload to "+preferredMethod+", long click for options:");
       	Log.d(Tags.LOG,"Opening database.");
+      	Log.d(Tags.LOG,"Files dir: "+getFilesDir());
     	LocalNZBMetadata.openDatabase();
     	Cursor cur;
     	  	
@@ -323,6 +337,17 @@ public class LocalNZB extends Activity {
 		LocalNZBMetadata.close();
     }
  	
+	final  Handler uploadDialogHandlerFTP = new Handler(){
+		public void handleMessage(Message msg){
+			// After uploading refresh the LocalNZB filelist.		
+			UPLOADDIALOG.dismiss();
+			if(!isUploadedFTP){
+				Toast.makeText(getApplicationContext(),"File could not be uploaded, error: "+FTPErrorCode, Toast.LENGTH_SHORT).show();
+			}
+			listLocalFiles();
+		}
+	};
+
 	final  Handler uploadDialogHandler = new Handler(){
 		public void handleMessage(Message msg){
 			// After uploading refresh the LocalNZB filelist.		
@@ -330,6 +355,7 @@ public class LocalNZB extends Activity {
 			listLocalFiles();
 		}
 	};
+
 	
 	// Wrapper for deleting file from LocalNZB list.
 	public void removeLocalNZBFile(String filename){

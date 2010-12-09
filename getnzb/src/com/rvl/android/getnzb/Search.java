@@ -79,6 +79,7 @@ public class Search extends Activity {
 	public boolean ENABLE_NEXTBUTTON = true;
 	public static String SEARCHTERM;
 	public static String SEARCHCATEGORY;
+	public int NUMSEARCHHITS;
 	public int CURRENT_PAGE = 1; 	// Start searching on page 1
 	public static final int MENU_GETCART = 0;
     public NZBDatabase LocalNZBMetadata = new NZBDatabase(this);
@@ -215,9 +216,15 @@ public class Search extends Activity {
 				
 				this.n = nzbTable.length;
 				Log.d(Tags.LOG,"N="+Integer.toString(this.n));
+				if(this.n == 0){
+					NUMSEARCHHITS = 0;
+					return null;
+				}
 				TagNode row = (TagNode) nzbTable[0];
+				
 				int numhits = row.getChildren().size() - 3;
 				
+				NUMSEARCHHITS = numhits;
 				// Check if there is a next-page...
 				// if so, the button is enabled in buildItemList()
 				// since we can't do it in this thread (non-UI-operations only)...
@@ -239,12 +246,16 @@ public class Search extends Activity {
 							
 				progresscounter += 5;
 				this.searchDialog.setProgress(progresscounter);
-				
+				xpathRows = "//table[@id='nzbtable']/tbody";
+				nzbTable = node.evaluateXPath(xpathRows);
+				Log.d(Tags.LOG,"1");
+				TagNode tbody = (TagNode) nzbTable[0];
 				Object[] tempObject;
 				for(int c=0;c<numhits;c++){
-					xpathRows = "//table[@id='nzbtable']/tbody/tr["+Integer.toString(c+3)+"]";
-					nzbTable = node.evaluateXPath(xpathRows);				
-	
+				
+					xpathRows = "//tr["+Integer.toString(c+3)+"]";
+					nzbTable = tbody.evaluateXPath(xpathRows);				
+					Log.d(Tags.LOG,"2");
 					// Name
 					tempObject = ((TagNode)nzbTable[0]).evaluateXPath("//td[2]/b/a");				
 					hit[c][0] = ((TagNode)tempObject[0]).getText().toString();
@@ -284,7 +295,6 @@ public class Search extends Activity {
 		protected void onPostExecute(final Void unused){
     		this.searchDialog.dismiss();
     		TextView statusbar = (TextView) findViewById(R.id.statusbar);
-    	
     		String status = "";
     		if(!LOGGEDIN){
     			status = "Not logged in! Check NZB account settings..."; 
@@ -293,16 +303,21 @@ public class Search extends Activity {
     		}
     		else{
     			Log.d(Tags.LOG,"* searchNZB() ended.");
-       			buildItemList();
+       			buildItemList(NUMSEARCHHITS);
     		}		
 		}
 	}
-    public void buildItemList(){
+    public void buildItemList(int numhits){
     	String hits[][] = HITLIST;
     	
     	setContentView(R.layout.links);
     	String item = "";
     	Log.d(Tags.LOG, "* buildItemList()");
+    	
+    	if(numhits==0){
+    		Toast.makeText(this, "No search result found!", Toast.LENGTH_LONG);
+    		return;
+    	}
     	
     	// -- Bind the itemlist to the itemarray with the arrayadapter
     	ArrayList<String> items = new ArrayList<String>();
