@@ -62,6 +62,7 @@ public class MySearch extends Activity{
 	public static String MODIFYTERM = "";
 	public static String MODIFYEXCLUDE = "";
 	public static String MODIFYGROUP = "";
+	public static HashMap<String,String> MYSEARCHAGEHASHMAP = new HashMap<String,String>();
 	public static HashMap<String,String> MYSEARCHCATEGORYHASHMAP = new HashMap<String,String>();
 	
 	protected void onCreate(Bundle savedInstanceState) {

@@ -59,7 +59,20 @@
 	<item>Console-XBox</item>
 	<item>Console-XBox360</item>
 </string-array>
+<string-array name="searchAge">
+	<item>All Time</item>
+	<item>1 Day</item>
+	<item>7 Days</item>
+	<item>14 Days</item>
+	<item>21 Days</item>
+	<item>50 Days</item>
+	<item>100 Days</item>
+	<item>140 Days</item>
+	<item>210 Days</item>
+	<item>365 Days</item>
+	<item>700 Days</item>
 
+</string-array>
 <string-array name="preferredUploadMethod">
 	<item>HellaNZB</item>
 	<item>FTP</item>

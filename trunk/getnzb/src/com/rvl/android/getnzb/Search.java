@@ -24,6 +24,7 @@
 
 package com.rvl.android.getnzb;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,6 +55,7 @@ import android.database.Cursor;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -79,12 +81,13 @@ public class Search extends Activity {
 	public boolean ENABLE_NEXTBUTTON = true;
 	public static String SEARCHTERM;
 	public static String SEARCHCATEGORY;
+	public static String SEARCHAGE;
 	public int NUMSEARCHHITS;
 	public int CURRENT_PAGE = 1; 	// Start searching on page 1
 	public static final int MENU_GETCART = 0;
     public NZBDatabase LocalNZBMetadata = new NZBDatabase(this);
     public static HashMap<String,String> SEARCHCATEGORYHASHMAP = new HashMap<String,String>();
-
+    public static HashMap<String,String> SEARCHAGEHASHMAP = new HashMap<String,String>();
     
 	protected void onCreate(Bundle savedInstanceState) {
 		Log.d(Tags.LOG, "- Starting search activity -");
@@ -93,13 +96,14 @@ public class Search extends Activity {
     			ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		setContentView(R.layout.search);
 		if(!SEARCHTERM.equals("")){
-			new searchNZB().execute(SEARCHTERM, SEARCHCATEGORY);
+			new searchNZB().execute(SEARCHTERM, SEARCHCATEGORY,SEARCHAGE);
 			return;
 		}
 		
 		TextView statusbar = (TextView) findViewById(R.id.statusbar);
 		statusbar.setText("Enter searchterm.");
 		createSearchCategoryMapping();
+		createAgeMapping();
 		
 	}
 	
@@ -124,8 +128,10 @@ public class Search extends Activity {
 		 		SEARCHTERM = ed.getText().toString().trim().replaceAll(" ", "+");
 		 		Spinner categorySpinner = (Spinner) findViewById(R.id.spinnerCategory);
 		 		SEARCHCATEGORY = SEARCHCATEGORYHASHMAP.get(categorySpinner.getSelectedItem().toString());
+		 		Spinner ageSpinner = (Spinner) findViewById(R.id.spinnerAge);
+		 		SEARCHAGE = SEARCHAGEHASHMAP.get(ageSpinner.getSelectedItem().toString());
 		 		Log.d(Tags.LOG,"Searching in "+SEARCHCATEGORY);
-		 		new searchNZB().execute(SEARCHTERM, SEARCHCATEGORY); 		
+		 		new searchNZB().execute(SEARCHTERM, SEARCHCATEGORY,SEARCHAGE); 		
 	    		break;
 		
 		   	case R.id.buttonMySearches:
@@ -135,7 +141,7 @@ public class Search extends Activity {
 	    		if(HITLIST.length == 25){
 	    			HITLIST = null;
 	    			CURRENT_PAGE++;
-	    			new searchNZB().execute(SEARCHTERM, SEARCHCATEGORY);
+	    			new searchNZB().execute(SEARCHTERM, SEARCHCATEGORY,SEARCHAGE);
 	    		}
 	    		else{
 	    			TextView statusbar = (TextView) findViewById(R.id.statusbar);
@@ -145,7 +151,7 @@ public class Search extends Activity {
 	    	case R.id.btn_previous:
 	    		HITLIST = null;
 	    		if(CURRENT_PAGE > 1) CURRENT_PAGE--;
-	    		new searchNZB().execute(SEARCHTERM, SEARCHCATEGORY);
+	    		new searchNZB().execute(SEARCHTERM, SEARCHCATEGORY, SEARCHAGE);
 	    		break;
 	    	case R.id.btn_backtosearch:
 	    		HITLIST = null;
@@ -185,7 +191,8 @@ public class Search extends Activity {
    			url  = "http://www.nzbs.org/index.php?action=search&q=";
    			url += args[0];
    			url += "&catid=" + args[1];
-   			url += "&age=&page="+Integer.toString(CURRENT_PAGE);
+   			url += "&age=" +  args[2];
+   			url += "&page="+Integer.toString(CURRENT_PAGE);
    			
    			Log.d(Tags.LOG,"Constructed URL:"+url);
 			try {
@@ -425,8 +432,12 @@ public class Search extends Activity {
     		
     				  InputStream is = entity.getContent();
     				  Log.d(Tags.LOG, "Saving file:"+filename); 
-    				  Log.d(Tags.LOG, "In directory:"+getFilesDir());
-    				  FileOutputStream out = openFileOutput(filename,Activity.MODE_WORLD_WRITEABLE);
+    				  Log.d(Tags.LOG, "--- In directory:"+Environment.getExternalStorageDirectory().toString());
+    				  
+    				  
+    				  //FileOutputStream out = openFileOutput(filename,Activity.MODE_WORLD_WRITEABLE);
+    				  File storageFile = new File("/mnt/sdcard/"+filename);
+    				  FileOutputStream out = new FileOutputStream(storageFile);
     				  
     				  // Update the DB with file metadata.
     				  
@@ -474,6 +485,20 @@ public class Search extends Activity {
 		startActivity(new Intent(this,MySearch.class));
 	}
     
+	public void createAgeMapping(){
+		SEARCHAGEHASHMAP.put("All Time", "");
+		SEARCHAGEHASHMAP.put("1 Day", "1");
+		SEARCHAGEHASHMAP.put("7 Days", "7");
+		SEARCHAGEHASHMAP.put("14 Days", "14");
+		SEARCHAGEHASHMAP.put("21 Days", "21");
+		SEARCHAGEHASHMAP.put("50 Days", "50");
+		SEARCHAGEHASHMAP.put("100 Days", "100");
+		SEARCHAGEHASHMAP.put("140 Days", "140");
+		SEARCHAGEHASHMAP.put("260 Days", "260");
+		SEARCHAGEHASHMAP.put("365 Days", "365");
+		SEARCHAGEHASHMAP.put("700 Days", "700");
+	}
+	
     public void createSearchCategoryMapping(){
     	// Create search mapping for Category Spinner.
 		SEARCHCATEGORYHASHMAP.put("All Categories", "0");	
