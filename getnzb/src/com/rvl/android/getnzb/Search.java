@@ -432,12 +432,16 @@ public class Search extends Activity {
     		
     				  InputStream is = entity.getContent();
     				  Log.d(Tags.LOG, "Saving file:"+filename); 
-    				  Log.d(Tags.LOG, "--- In directory:"+Environment.getExternalStorageDirectory().toString());
+    				
+    				  Log.d(Tags.LOG, "In directory:"+getFilesDir());
     				  
+    				  FileOutputStream out = openFileOutput(filename,Activity.MODE_WORLD_WRITEABLE);
     				  
-    				  //FileOutputStream out = openFileOutput(filename,Activity.MODE_WORLD_WRITEABLE);
-    				  File storageFile = new File("/mnt/sdcard/"+filename);
-    				  FileOutputStream out = new FileOutputStream(storageFile);
+    				  // -- Trying for custom save directory:
+    				  // Log.d(Tags.LOG, "--- In directory:"+Environment.getExternalStorageDirectory().toString());
+    				  // FileOutputStream out = openFileOutput(filename,Activity.MODE_WORLD_WRITEABLE);
+    				  // File storageFile = new File("/mnt/sdcard/"+filename);
+    				  // FileOutputStream out = new FileOutputStream(storageFile);
     				  
     				  // Update the DB with file metadata.
     				  
